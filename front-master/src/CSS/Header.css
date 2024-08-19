@@ -1,0 +1,104 @@
+/* Google Fonts 임포트 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+/* Header 스타일 */
+.header {
+  background: #f5f5f5;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header .top-nav {
+  width: calc(100% - 20px); /* 전체 너비에서 여백을 빼고 */
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+  padding-bottom: 10px;
+  margin-right: 10px; /* 오른쪽으로 조금 이동 */
+}
+
+.header .top-nav-item {
+  font-size: 12px;
+  color: #2e3632;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+.header .divider {
+  width: 100%; /* 구분선 길이 조절 */
+  max-width: 100%; /* 최대 너비를 전체 너비로 설정 */
+  border: none;
+  border-top: 1px solid #dfdfdf;
+  margin: 0 auto; /* 중앙 정렬 */
+}
+
+.header h1 {
+  font-size: 32px;
+  color: #004d40;
+  cursor: pointer;
+  margin: 10px 0;
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+.header nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+  position: relative;
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+.header .nav-item {
+  margin: 0 15px;
+  font-size: 16px;
+  color: #2e3632;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 5px;
+}
+
+/* 내비게이션 링크에 마우스 오버 시 색상 변경 */
+.header .nav-item:hover {
+  color: #004d40; /* 마우스를 올렸을 때 색상 변경 */
+}
+
+.header .menu-icon {
+  font-size: 20px;
+  color: #004d40;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  margin-top: 5px;
+}
+
+/* 폼 박스 스타일 */
+.header input[type="text"],
+.header input[type="password"],
+.header input[type="email"],
+.header select,
+.header textarea {
+  height: 35px;
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin: 5px 0;
+}
+
+/* textarea의 경우 높이를 따로 설정 */
+.header textarea {
+  height: 80px;
+}

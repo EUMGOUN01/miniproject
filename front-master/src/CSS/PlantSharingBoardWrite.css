@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+.plant-sharing-board-write-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 40px auto;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.plant-sharing-board-write-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.plant-sharing-board-write-page-title {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.plant-sharing-board-label {
+  font-size: 16px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.plant-sharing-board-select,
+.plant-sharing-board-input,
+.plant-sharing-board-textarea,
+.plant-sharing-board-file-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.plant-sharing-board-input,
+.plant-sharing-board-textarea {
+  width: 100%;
+}
+
+.plant-sharing-board-textarea {
+  height: 200px;
+}
+
+.map-container {
+  margin-bottom: 10px; 
+}
+
+.plant-search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px; 
+}
+
+.plant-search-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  height: 40px;
+  flex: 1;
+}
+
+.search-button {
+  padding: 10px 20px;
+  background-color: #0F2C22;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  height: 40px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.search-button:hover {
+  background-color: #00332a;
+}
+
+.plant-sharing-board-button {
+  padding: 10px 15px;
+  background-color: #0F2C22;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: normal;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 40px;
+}
+
+.plant-sharing-board-button:hover {
+  background-color: #00332a;
+}

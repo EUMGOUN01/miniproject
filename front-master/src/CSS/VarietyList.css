@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+
+
+/* 타이틀 스타일 */
+.VarietyList-title {
+  color: var(--primary-color); /* 주요 색상 변수 */
+  font-size: 2rem;             /* 폰트 크기 */
+  margin: 0 0 10px 0;         /* 마진 설정 */
+  position: relative;          /* 상대 위치 설정 */
+  left: 0;                     /* 왼쪽으로 이동 제거 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 컨테이너 스타일 */
+.VarietyList-container {
+  text-align: center; /* 중앙 정렬 */
+  padding: 50px; /* 여백 추가 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 항목 리스트 스타일 */
+.VarietyList-item-list {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5열 고정 */
+  gap: 10px; /* 항목 간의 간격 조정 */
+  list-style-type: none;
+  padding: 0;
+  justify-content: center; /* 그리드 항목을 중앙에 배치 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 개별 카드 스타일 */
+.VarietyList-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 이미지와 텍스트 중앙 정렬 */
+  text-align: center;
+  width: 100%; /* 항목의 너비를 100%로 설정 */
+  max-width: 300px; /* 항목의 최대 너비 설정 */
+  margin: 0 auto; /* 중앙 정렬 */
+  background-color: var(--card-bg-color); /* 카드 배경색 */
+  border-radius: var(--card-border-radius); /* 카드 모서리 둥글기 */
+  box-shadow: var(--card-shadow); /* 카드 그림자 */
+  overflow: hidden; /* 자식 요소가 카드 경계를 넘어가지 않도록 설정 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* 부드러운 트랜지션 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.VarietyList-item:hover {
+  transform: translateY(-5px); /* 호버 시 약간 떠오르는 효과 */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* 호버 시 그림자 강화 */
+}
+
+/* 이미지 스타일 */
+.VarietyList-item img {
+  width: 100%; /* 이미지 너비를 항목의 100%로 설정 */
+  height: 200px; /* 이미지 높이 설정 */
+  object-fit: cover; /* 이미지 비율 유지 및 잘림 방지 */
+  display: block; /* 이미지 아래 공백을 제거 */
+  margin-bottom: 10px; /* 이미지와 텍스트 사이의 간격 조정 */
+  box-sizing: border-box; /* padding과 border를 너비에 포함 */
+}
+
+/* 제목과 설명 텍스트 스타일 */
+.VarietyList-item h2, .VarietyList-item p {
+  margin: 0; /* 텍스트의 기본 여백 제거 */
+  padding: 10px; /* 텍스트와 카드 가장자리 간의 여백 추가 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 모바일 반응형 디자인 */
+@media (max-width: 1200px) {
+  .VarietyList-item-list {
+    grid-template-columns: repeat(4, 1fr); /* 화면이 좁아질 때 4열로 변경 */
+  }
+}
+
+@media (max-width: 900px) {
+  .VarietyList-item-list {
+    grid-template-columns: repeat(3, 1fr); /* 화면이 더 좁아질 때 3열로 변경 */
+  }
+}
+
+@media (max-width: 600px) {
+  .VarietyList-item-list {
+    grid-template-columns: repeat(2, 1fr); /* 화면이 더 좁아질 때 2열로 변경 */
+  }
+}
+
+@media (max-width: 400px) {
+  .VarietyList-item-list {
+    grid-template-columns: 1fr; /* 화면이 가장 좁을 때 1열로 변경 */
+  }
+}

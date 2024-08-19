@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+.post-detail-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px; /* 패딩 조정 */
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 적용 */
+  display: flex;
+  flex-direction: column;
+  min-height: 80vh; /* 화면의 80% 높이로 조정 */
+  box-sizing: border-box;
+}
+
+.post-detail-title {
+  font-size: 24px; /* 제목 폰트 크기 조정 */
+  margin-bottom: 15px; /* 제목과 메타 정보 사이 여백 조정 */
+  color: #333;
+}
+
+.post-detail-meta {
+  display: flex;
+  flex-wrap: wrap; /* 요소가 한 줄에 맞지 않을 경우 다음 줄로 넘어가도록 설정 */
+  gap: 15px; /* 요소 사이 간격 조정 */
+  font-size: 14px; /* 메타 정보 폰트 크기 조정 */
+  margin-bottom: 15px; /* 메타 정보와 내용 사이 여백 조정 */
+  color: #555;
+}
+
+.post-detail-content {
+  font-size: 14px; /* 내용 폰트 크기 조정 */
+  color: #333;
+  margin-bottom: 20px; /* 내용과 이미지 사이 여백 조정 */
+}
+
+.post-detail-img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 20px; /* 이미지와 내용 사이 여백 조정 */
+  border: 1px solid #ddd;
+  border-radius: 8px; /* 이미지 모서리 둥글게 조정 */
+}
+
+.post-detail-comments {
+  margin-top: 30px; /* 댓글란과 내용 사이 여백 조정 */
+  padding-top: 15px; /* 댓글란과 댓글 입력란 사이 여백 조정 */
+  border-top: 1px solid #ddd; /* 댓글란 상단에 테두리 추가 */
+}
+
+.post-detail-comments h2 {
+  font-size: 20px; /* 댓글 제목 폰트 크기 조정 */
+  margin-bottom: 10px; /* 제목과 댓글 입력란 사이 여백 조정 */
+}
+
+.post-detail-comment-input {
+  display: flex;
+  flex-direction: column; /* 입력란과 버튼을 세로로 배치 */
+  gap: 10px; /* 입력란과 버튼 사이 여백 조정 */
+}
+
+.post-detail-comment-input textarea {
+  width: 100%;
+  padding: 8px; /* 텍스트 영역 패딩 조정 */
+  font-size: 14px; /* 텍스트 영역 폰트 크기 조정 */
+  border: 1px solid #ddd;
+  border-radius: 4px; /* 텍스트 영역 모서리 둥글게 조정 */
+  box-sizing: border-box;
+  resize: vertical; /* 수직으로만 크기 조절 가능하도록 설정 */
+}
+
+.post-detail-comment-submit-button {
+  align-self: flex-start; /* 버튼을 왼쪽 정렬 */
+  padding: 8px 16px; /* 버튼 패딩 조정 */
+  background-color: #0F2C22;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 14px; /* 버튼 폰트 크기 조정 */
+  border-radius: 4px; /* 버튼 모서리 둥글게 조정 */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.post-detail-comment-submit-button:hover {
+  background-color: #00332a;
+  transform: scale(1.05);
+}
+
+.post-detail-comment-list {
+  margin-top: 15px; /* 댓글 목록과 댓글 입력란 사이 여백 조정 */
+}
+
+.post-detail-comment-item {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px; /* 댓글 모서리 둥글게 조정 */
+  margin-bottom: 10px; /* 댓글 사이 여백 조정 */
+}
+
+.post-detail-back-button {
+  align-self: center; /* 버튼을 수평 중앙으로 정렬 */
+  padding: 8px 16px; /* 버튼 패딩 조정 */
+  background-color: #0F2C22;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 14px; /* 버튼 폰트 크기 조정 */
+  font-weight: normal;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: auto; /* 컨테이너의 맨 아래로 위치시킴 */
+}
+
+.post-detail-back-button:hover {
+  background-color: #00332a;
+  transform: scale(1.05);
+}
+
+.post-detail-image-upload {
+  margin-top: 20px; /* 이미지 업로드와 댓글 목록 사이 여백 조정 */
+  text-align: center;
+}
+
+.post-detail-image-input {
+  display: block;
+  margin: 0 auto;
+  font-size: 14px;
+}
+
+.post-detail-image-preview {
+  margin-top: 15px;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}

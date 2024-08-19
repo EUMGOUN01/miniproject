@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+.Signpage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 폼 컨테이너 스타일 */
+.Signform-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 제목 스타일 */
+.Signtitle {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 폼 스타일 */
+.Signform {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 입력 그룹 스타일 */
+.Signinput-group {
+  margin-bottom: 15px;
+  width: 100%;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 레이블 스타일 */
+.Signlabel {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #666;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 입력 필드 스타일 */
+.Signinput {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 버튼 스타일 */
+.Signbutton {
+  background-color: #0F2C22;
+  color: #ffffff;
+  border: none;
+  padding: 12px 0; /* 버튼의 높이 */
+  cursor: pointer;
+  font-size: 16px; /* 폰트 크기 */
+  width: 100%; /* 버튼이 컨테이너 너비에 맞게 설정 */
+  margin-top: 10px; /* 버튼들 사이의 여백 */
+  box-sizing: border-box; /* 패딩과 테두리를 포함하여 버튼의 총 너비와 높이를 계산 */
+  line-height: 1.5; /* 텍스트의 줄 높이 */
+  transition: background-color 0.3s ease; /* 배경색 변경 애니메이션 */
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 버튼 호버 스타일 */
+.Signbutton:hover {
+  background-color: #00332a; /* 호버 시 배경색 변경 */
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 로그인 링크 스타일 */
+.Signlogin-button {
+  width: 100%; /* 버튼이 컨테이너 너비에 맞게 설정 */
+  margin-top: 5px; /* 버튼들 사이의 여백 */
+  display: inline-block; /* 버튼처럼 보이게 하기 위해 인라인 블록으로 설정 */
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+/* 링크 컨테이너 스타일 */
+.Signlink-container {
+  margin-top: 5px;
+  text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}

@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+/* 기본적인 컨테이너 스타일 */
+.write-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 30px auto; /* 중앙 정렬을 위한 자동 여백 */
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center; /* 중앙 정렬 */
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 폼 스타일 */
+.write-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%; /* 폼 요소가 컨테이너의 너비를 가득 채우도록 설정 */
+  max-width: 800px; /* 폼의 최대 너비를 설정 */
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 페이지 제목 스타일 */
+.write-page-title {
+  font-size: 24px;
+  font-weight: normal; /* 제목 글자 굵기 설정 */
+  color: #333;
+  text-align: left; /* 제목을 왼쪽 정렬 */
+  margin-bottom: 20px; /* 제목과 폼 요소 사이에 여백 추가 */
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 입력 필드 및 선택 박스 공통 스타일 */
+.write-input, .write-textarea, .write-file-input {
+  padding: 14px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  width: 100%; /* 부모 요소의 너비에 맞게 조정 */
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 제목 입력 필드 스타일 */
+.write-input {
+  max-width: 100%; /* 최대 너비 설정 */
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 텍스트 영역 스타일 */
+.write-textarea {
+  height: 250px;
+  resize: vertical;
+  max-width: 100%; /* 최대 너비 설정 */
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 파일 입력 스타일 */
+.write-file-input {
+  padding: 0;
+  font-size: 16px;
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 버튼 스타일 */
+.write-button {
+  padding: 10px 20px; /* 버튼의 패딩을 줄여서 글자 크기에 맞춤 */
+  background-color: #0F2C22;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: normal; /* 버튼 글자 굵기 설정 */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+  align-self: flex-end; /* 버튼을 오른쪽 끝으로 정렬 */
+}
+
+.write-button:hover {
+  background-color: #00332a;
+  transform: scale(1.05);
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 폼 요소의 포커스 스타일 */
+.write-input:focus, .write-select:focus, .write-textarea:focus {
+  border-color: #004d40;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 77, 64, 0.2);
+  font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .write-container {
+    padding: 15px;
+    margin: 20px auto;
+  }
+
+  .write-page-title {
+    font-size: 20px;
+  }
+
+  .write-input, .write-select, .write-textarea, .write-file-input {
+    font-size: 14px;
+  }
+
+  .write-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+.preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.preview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.preview-image {
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: cover;
+}

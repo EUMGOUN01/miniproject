@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.login-form-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;  /* 컨테이너 가로 크기 증가 */
+  width: 100%;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.login-title {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.login-input-group {
+  margin-bottom: 15px;
+  width: 100%; 
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.login-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #666;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.login-input {
+  width: 100%; 
+  max-width: 350px;  /* 입력 필드 최대 너비 */
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box; 
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.login-submit-button {
+  background-color: #0F2C22;
+  color: #ffffff;
+  border: none;
+  padding: 12px 0; /* 버튼의 높이 */
+  cursor: pointer;
+  font-size: 16px; 
+  width: 100%;
+  max-width: 350px;  /* 버튼의 최대 가로 길이 설정 */
+  box-sizing: border-box;
+  text-align: center;
+  margin-bottom: 10px;  /* 버튼 사이의 간격 조정 */
+  line-height: 1.4; 
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.signup-button {
+  background-color: #0F2C22; /* 다르게 설정할 배경색 */
+  color: #ffffff;
+  border: none;
+  padding: 12px 0; /* 버튼의 높이 */
+  cursor: pointer;
+  font-size: 16px; 
+  width: 100%;
+  max-width: 350px;  /* 버튼의 최대 가로 길이 설정 */
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;  /* 링크에 기본 밑줄 제거 */
+  display: inline-block;  /* 링크를 버튼처럼 보이도록 */
+  margin-bottom: 5px;  /* 버튼 사이의 간격 조정 */
+  line-height: 1.4; 
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.signup-button:last-of-type {
+  margin-bottom: 0;  /* 마지막 버튼의 아래 간격 제거 */
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.login-link-container {
+  margin-top: 10px;
+  text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}
+
+.login-link {
+  color: #004d40;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+}

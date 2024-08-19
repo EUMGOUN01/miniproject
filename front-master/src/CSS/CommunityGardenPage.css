@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+.Community-container {
+  display: flex;
+  flex-direction: row; /* 텍스트와 지도를 나란히 배치 */
+  align-items: center; /* 수직 중앙 정렬 */
+  padding: 20px;
+  gap: 20px; /* 요소 사이 간격 */
+  justify-content: center; /* 수평 중앙 정렬 */
+  height: 100vh; /* 전체 화면 높이 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.Community-text-section {
+  flex: 1;
+  max-width: 40%; /* 최대 너비 설정 */
+  padding-right: 20px; /* 오른쪽 여백 */
+  position: relative; /* 자식 요소의 절대 위치를 위한 상대 위치 설정 */
+  display: flex;
+  flex-direction: column; /* 세로 방향으로 배치 */
+  justify-content: center; /* 내용 세로 중앙 정렬 */
+  animation: fadeIn 3s ease-in-out; /* 애니메이션 추가 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.Community-text-section h1 {
+  font-size: 3rem; /* 제목 크기 확대 */
+  font-weight: bold; /* 굵게 */
+  margin-bottom: 15px; /* 제목과 본문 사이 여백 확대 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.Community-text-section p {
+  font-size: 1.25rem; /* 본문 크기 확대 */
+  line-height: 1.6; /* 줄 간격 조정 */
+  text-align: left; /* 왼쪽 정렬 */
+  margin: 0; /* 여백 제거 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 텍스트가 서서히 나타나는 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.Community-more-info {
+  margin-top: 20px; /* 텍스트와 링크 사이 간격 설정 */
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 아이콘과 텍스트 사이 간격 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.Community-more-info-link {
+  color: gray;
+  font-size: 1.2rem; /* 글자 크기 조정 */
+  text-decoration: none; /* 링크 밑줄 제거 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.Community-info-icon {
+  font-size: 1.5rem; /* 아이콘 크기 조정 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.Community-map-section {
+  flex: 2;
+  width: 100%; /* 지도 너비 100%로 설정 */
+  max-width: 800px; /* 최대 너비 설정 */
+  height: 400px; /* 지도 높이 줄이기 */
+  display: flex; /* 플렉스 컨테이너 설정 */
+  justify-content: center; /* 수평 중앙 정렬 */
+  align-items: center; /* 수직 중앙 정렬 */
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
