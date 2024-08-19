@@ -155,3 +155,32 @@
   width: 100%;
   font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
+
+.board-category-select {
+  appearance: none; /* 기본 드롭다운 화살표 제거 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  padding: 5px 10px;
+  font-size: 14px;
+  height: 35px; /* 버튼과 동일한 높이 */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  color: #333;
+  box-sizing: border-box;
+  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+  cursor: pointer;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iNCIgdmlld0JveD0iMCAwIDEyIDQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZmlsbD0iIzk5OTk5OSIgc3Ryb2tlPSJub25lIiBkPSJNMSAxTDYgM0wxIDdaIi8+PC9zdmc+');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.board-category-select:focus {
+  outline: none;
+  border-color: #0F3830; /* 포커스 시 테두리 색상 변경 */
+}
+
+.board-category-select:hover {
+  border-color: #0F3830; /* 호버 시 테두리 색상 변경 */
+}

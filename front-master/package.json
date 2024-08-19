@@ -55,5 +55,6 @@
   },
   "devDependencies": {
     "tailwindcss": "^3.4.7"
-  }
+  },
+   "proxy": "http://api.nongsaro.go.kr"
 }

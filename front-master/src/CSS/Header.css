@@ -27,10 +27,24 @@
 }
 
 .header .top-nav-item {
-  font-size: 12px;
+  font-size: 12px; /* 로그아웃 버튼의 글자 크기를 16px로 설정 */
   color: #2e3632;
   cursor: pointer;
   font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
+}
+
+/* 추가한 유저 네임과 로그아웃 버튼 사이 간격 조정 */
+.header .user-info {
+  display: flex;
+  align-items: center;
+  gap: 1px; /* 유저 네임과 로그아웃 버튼 간의 간격 */
+}
+
+.header .username {
+  font-size: 12px; /* 유저 네임 글자 크기와 로그아웃 버튼 글자 크기 동일하게 설정 */
+  color: #2e3632;
+  font-weight: 400; /* 텍스트 두께를 일반으로 설정 */
+  margin-right: 15px; /* 추가적인 간격 조정 */
 }
 
 .header .divider {

@@ -1,36 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGardenList, usePlantDetail } from '../Component/Hook'; // 훅 불러오기
-import '../CSS/InfoPage.css'; // 스타일링
+import { useGardenList, usePlantDetail } from './hooks';
+import '../CSS/InfoPage.css';
 
 const InfoPage = () => {
-  const apiKey = process.env.REACT_APP_API_KEY; // 환경 변수에서 API 키 가져오기
-  const navigate = useNavigate(); // 페이지 전환을 위한 훅
-  const { data: gardenData, loading: gardenLoading, error: gardenError } = useGardenList(apiKey); // 정원 목록 데이터 훅 호출
-  const [selectedPlant, setSelectedPlant] = useState(null); // 선택한 식물의 상태 관리
-  const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태 관리
+  const apiKey = process.env.REACT_APP_API_KEY;
+  const navigate = useNavigate();
+  const { data: gardenData, loading: gardenLoading, error: gardenError } = useGardenList(apiKey);
+  const [selectedPlant, setSelectedPlant] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // 모달 닫기
   const handleCloseModal = () => setSelectedPlant(null);
-
-  // 식물 선택 시 모달 열기
   const handlePlantClick = (cntntsNo) => setSelectedPlant(cntntsNo);
 
-  // 식물 상세 정보 데이터 훅 호출
   const { data: plantData, loading: plantLoading, error: plantError } = usePlantDetail(apiKey, selectedPlant);
 
-  // 검색어 입력 변경 처리
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
-  // 검색어에 따라 정원 데이터를 필터링
   const filteredGardenData = gardenData?.response?.body?.items?.item?.filter(garden =>
     garden.cntntsSj.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // 데이터 로딩 중일 때 표시할 메시지
   if (gardenLoading) return <p>로딩 중...</p>;
-
-  // 데이터 로딩 에러 발생 시 표시할 메시지
   if (gardenError) return <p>에러 발생: {gardenError}</p>;
 
   return (
@@ -62,7 +53,6 @@ const InfoPage = () => {
         ))}
       </div>
 
-      {/* 선택한 식물이 있을 때 모달 표시 */}
       {selectedPlant && (
         <div className="garden-modal">
           <div className="garden-modal-content">
@@ -70,7 +60,7 @@ const InfoPage = () => {
             {plantLoading ? <p>로딩 중...</p> : plantError ? <p>에러 발생: {plantError}</p> : (
               plantData && plantData.response && plantData.response.body && plantData.response.body.item && (
                 <div>
-                  <p><strong>이름:</strong> {plantData.response.body.item.distbNm}</p>
+                   <p><strong>이름:</strong> {plantData.response.body.item.distbNm}</p>
                   <p><strong>콘텐츠 번호:</strong> {plantData.response.body.item.cntntsNo}</p>
                   <p><strong>라틴어 이름:</strong> {plantData.response.body.item.plntbneNm}</p>
                   <p><strong>영어 이름:</strong> {plantData.response.body.item.plntzrNm}</p>

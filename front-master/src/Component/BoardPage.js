@@ -1,5 +1,3 @@
-// BoardPage.js
-// 자유게시판 목록 보여줌.
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CiSearch } from 'react-icons/ci';
@@ -11,12 +9,16 @@ const BoardPage = () => {
   const location = useLocation();
 
   const [boardData, setBoardData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // 현재 입력된 검색어 상태
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState(''); // 실제로 적용된 검색어 상태
+  const [selectedCategory, setSelectedCategory] = useState(''); // 추가된 카테고리 상태
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const categories = ['질문', '수다']; // 카테고리 리스트
 
   const fetchBoardData = async (page, size) => {
     setLoading(true);
@@ -24,11 +26,9 @@ const BoardPage = () => {
       const response = await fetch(`http://10.125.121.180:8080/api/public/freeboard?page=${page}&size=${size}`);
       const data = await response.json();
       
-      // 데이터 설정
       setBoardData(Array.isArray(data) ? data : []);
       
-      // 총 페이지 수 계산 (총 데이터 개수는 데이터의 길이를 기반으로 계산)
-      const totalDataCount = data.length; 
+      const totalDataCount = data.length;
       setTotalPages(Math.ceil(totalDataCount / size));
 
       setError(null);
@@ -44,15 +44,20 @@ const BoardPage = () => {
     fetchBoardData(currentPage, pageSize);
   }, [currentPage, pageSize]);
 
+  // 페이지 이동 시 검색어와 카테고리 초기화
   useEffect(() => {
-    if (location.state?.shouldRefetch) {
-      setCurrentPage(0);
+    if (location.pathname === '/board') {
+      setSearchQuery('');
+      setAppliedSearchQuery('');
+      setSelectedCategory('');
     }
-  }, [location.state]);
+  }, [location.pathname]);
 
   const filteredPosts = useMemo(() => {
-    return boardData.filter(post => post.title.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [boardData, searchQuery]);
+    return boardData
+      .filter(post => post.title.toLowerCase().includes(appliedSearchQuery.toLowerCase())) // 실제 적용된 검색어에 따라 필터링
+      .filter(post => (selectedCategory ? post.type === selectedCategory : true)); // 카테고리 필터
+  }, [boardData, appliedSearchQuery, selectedCategory]);
 
   const indexOfLastPost = (currentPage + 1) * pageSize;
   const indexOfFirstPost = indexOfLastPost - pageSize;
@@ -61,12 +66,16 @@ const BoardPage = () => {
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 0 && pageNumber < totalPages) {
-      setCurrentPage(pageNumber);
+      setSearchQuery(''); // 페이지를 변경할 때 검색어 초기화
+      setAppliedSearchQuery(''); // 실제 적용된 검색어도 초기화
+      setSelectedCategory(''); // 카테고리도 초기화
+      setCurrentPage(pageNumber); // 페이지 변경
     }
   };
 
   const handleSearch = () => {
-    setCurrentPage(0);
+    setAppliedSearchQuery(searchQuery); // 검색 버튼을 눌렀을 때 검색어를 적용
+    setCurrentPage(0); // 검색 시 첫 페이지로 돌아감
   };
 
   const pageRange = 5;
@@ -80,6 +89,18 @@ const BoardPage = () => {
           <h1>자유 게시판</h1>
           <div className="board-search-container">
             <div className="board-search-wrapper">
+              {/* 카테고리 선택 드롭다운 */}
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="board-category-select"
+              >
+                <option value="">전체</option>
+                {categories.map((category, index) => (
+                  <option key={index} value={category}>{category}</option>
+                ))}
+              </select>
+              
               <input
                 type="text"
                 value={searchQuery}
@@ -87,7 +108,7 @@ const BoardPage = () => {
                 placeholder="검색어를 입력하세요"
                 className="board-search-input"
               />
-              <CiSearch className="board-search-icon" onClick={handleSearch} /> {/* 검색 아이콘 클릭 기능 추가 */}
+              <CiSearch className="board-search-icon" onClick={handleSearch} />
             </div>
             <div className="board-button-container">
               <button onClick={handleSearch} className="board-search-button">검색</button>

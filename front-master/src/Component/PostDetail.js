@@ -27,10 +27,26 @@ const PostDetail = () => {
     };
 
     const fetchComments = async () => {
+      const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰을 가져옴
+      if (!token) {
+        alert('로그인이 필요합니다.');
+        navigate('/login'); // 로그인이 안 된 경우 로그인 페이지로 리다이렉트
+        return;
+      }
+
       try {
-        const response = await fetch(`http://10.125.121.180:8080/api/freecomment?freeBoardId=${freeBoardId}`);
-        const data = await response.json();
-        setComments(data);
+        const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/${freeBoardId}/freecomment`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // JWT 토큰을 헤더에 추가
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setComments(data); // 댓글 데이터 저장
+        } else {
+          setError('댓글 데이터를 불러오는 중 문제가 발생했습니다.');
+        }
       } catch (error) {
         console.error('Error fetching comments:', error);
         setError('댓글 데이터를 가져오는 중 오류가 발생했습니다.');
@@ -39,13 +55,13 @@ const PostDetail = () => {
 
     fetchPost();
     fetchComments();
-  }, [freeBoardId]);
+  }, [freeBoardId, navigate]);
 
   // 게시글 삭제 처리 함수
   const handleDelete = async () => {
     if (window.confirm('게시글을 삭제하시겠습니까?')) {
       try {
-        await fetch(`http://10.125.121.180:8080/api/freeboard/${freeBoardId}`, {
+        await fetch(`http://10.125.121.180:8080/api/users/freeboard/${freeBoardId}`, {
           method: 'DELETE',
         });
         navigate('/board', { state: { shouldRefetch: true } }); // 삭제 후 게시글 목록 페이지로 이동
@@ -59,21 +75,33 @@ const PostDetail = () => {
   // 댓글 제출 처리 함수
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
     try {
-      const response = await fetch('http://10.125.121.180:8080/api/freecomment', {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/${freeBoardId}/freecomment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // JWT 토큰을 헤더에 추가
         },
         body: JSON.stringify({
           freeBoardId,
           content: newComment,
-          username: '작성자명', // 여기에 실제 작성자명을 넣어야 합니다.
+          username: localStorage.getItem('username'), // 로그인한 사용자의 이름을 전송
         }),
       });
-      const data = await response.json();
-      setComments([...comments, data]);
-      setNewComment('');
+
+      if (response.ok) {
+        const data = await response.json();
+        setComments([...comments, data]); // 새로운 댓글을 기존 댓글에 추가
+        setNewComment(''); // 입력 필드 초기화
+      } else {
+        setError('댓글을 등록하는 중 오류가 발생했습니다.');
+      }
     } catch (error) {
       console.error('Error submitting comment:', error);
       setError('댓글을 등록하는 중 오류가 발생했습니다.');
@@ -82,20 +110,32 @@ const PostDetail = () => {
 
   // 댓글 수정 처리 함수
   const handleCommentEdit = async (commentId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
     try {
-      const response = await fetch(`http://10.125.121.180:8080/api/freecomment/${commentId}`, {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/freecomment/${commentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // JWT 토큰을 헤더에 추가
         },
         body: JSON.stringify({
           content: editCommentContent,
         }),
       });
-      const data = await response.json();
-      setComments(comments.map(comment => (comment.free_comment_id === commentId ? data : comment)));
-      setEditCommentId(null);
-      setEditCommentContent('');
+
+      if (response.ok) {
+        const data = await response.json();
+        setComments(comments.map(comment => (comment.free_comment_id === commentId ? data : comment)));
+        setEditCommentId(null);
+        setEditCommentContent('');
+      } else {
+        setError('댓글 수정에 실패했습니다.');
+      }
     } catch (error) {
       console.error('Error editing comment:', error);
       setError('댓글을 수정하는 중 오류가 발생했습니다.');
@@ -104,10 +144,20 @@ const PostDetail = () => {
 
   // 댓글 삭제 처리 함수
   const handleCommentDelete = async (commentId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
     if (window.confirm('댓글을 삭제하시겠습니까?')) {
       try {
-        await fetch(`http://10.125.121.180:8080/api/freecomment/${commentId}`, {
+        await fetch(`http://10.125.121.180:8080/api/users/freeboard/freecomment/${commentId}`, {
           method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`, // JWT 토큰을 헤더에 추가
+            'Content-Type': 'application/json',
+          },
         });
         setComments(comments.filter(comment => comment.free_comment_id !== commentId));
       } catch (error) {
@@ -144,10 +194,11 @@ const PostDetail = () => {
               </tr>
             </tbody>
           </table>
+
           <h1 className="post-title">{post.title || '정보 없음'}</h1>
           <p className="post-content">{post.content || '정보 없음'}</p>
 
-          {/* 이미지 렌더링 부분 - 수정하지 마시오. */}
+          {/* 이미지 렌더링 부분 */}
           {post.fimges && post.fimges.length > 0 ? (
             <div className="post-images">
               {post.fimges.map((image, index) => (
@@ -168,6 +219,7 @@ const PostDetail = () => {
             삭제하기
           </button>
 
+          {/* 댓글 섹션 */}
           <div className="comments-section">
             <h2>댓글</h2>
             <form onSubmit={handleCommentSubmit}>
@@ -196,7 +248,7 @@ const PostDetail = () => {
                     <div>
                       <p>{comment.content}</p>
                       <span>{comment.username}</span>
-                      <span>{new Date(comment.createdate).toLocaleDateString()}</span>
+                      <span>{new Date(comment.createDate).toLocaleDateString()}</span>
                       <button onClick={() => {
                         setEditCommentId(comment.free_comment_id);
                         setEditCommentContent(comment.content);

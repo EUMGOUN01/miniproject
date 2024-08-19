@@ -1,106 +1,62 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import '../CSS/VarietyList.css';
+import { XMLParser } from 'fast-xml-parser'; 
+import '../CSS/VarietyList.css'; 
 
 const VarietyList = () => {
   const [data, setData] = useState([]);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const apiKey = process.env.REACT_APP_API_KEY_S;
-  const navigate = useNavigate();
+  const apiKey = process.env.REACT_APP_API_KEY_S; // 환경 변수에서 API 키 가져오기
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `http://api.nongsaro.go.kr/service/cropEbook/ebookList?apiKey=${apiKey}`,
-          {
-            headers: {
-              'Accept': 'application/xml', // XML 응답을 받기 위한 헤더 설정
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP 오류! 상태 코드: ${response.status}`);
-        }
-
-        const textData = await response.text();
-
+        const response = await axios.get('/service/cropEbook/ebookList', {
+          params: {
+            apiKey: apiKey,
+          },
+          headers: {
+            'Accept': 'application/xml', // XML 응답을 받기 위한 헤더
+          },
+        });
         // XML을 JSON으로 변환
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(textData, 'application/xml');
-        const jsonResult = xmlToJson(xmlDoc);
-
-        console.log('JSON 응답:', jsonResult); // 데이터 구조 확인을 위한 로깅
-
-        const items = jsonResult?.response?.body?.items?.item || [];
+        const parser = new XMLParser();
+        const result = parser.parse(response.data);
+        
+        // JSON 형태로 변환된 데이터 구조 확인
+        console.log('JSON 응답:', result);
+        // 데이터 접근 경로를 실제 구조에 맞게 조정
+        const items = result?.response?.body?.items?.item || [];
         setData(items);
+        setLoading(false);
       } catch (error) {
-        console.error('API 호출 오류:', error);
+        console.error('API 호출 오류:', error); // 오류 로깅
         setError(error);
-      } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [apiKey]);
-
-  // XML을 JSON으로 변환하는 함수
-  const xmlToJson = (xml) => {
-    if (xml.nodeType === 1) { // 요소 노드
-      const obj = {};
-
-      // 요소의 속성 가져오기
-      if (xml.attributes.length > 0) {
-        obj["@attributes"] = {};
-        for (let j = 0; j < xml.attributes.length; j++) {
-          const attribute = xml.attributes.item(j);
-          obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
-        }
-      }
-
-      // 자식 노드 처리
-      if (xml.hasChildNodes()) {
-        for (let i = 0; i < xml.childNodes.length; i++) {
-          const item = xml.childNodes.item(i);
-          const nodeName = item.nodeName;
-          if (typeof obj[nodeName] === "undefined") {
-            obj[nodeName] = xmlToJson(item);
-          } else {
-            if (!Array.isArray(obj[nodeName])) {
-              obj[nodeName] = [obj[nodeName]];
-            }
-            obj[nodeName].push(xmlToJson(item));
-          }
-        }
-      }
-
-      return obj;
-    } else if (xml.nodeType === 3 && xml.nodeValue.trim()) { // 텍스트 노드
-      return xml.nodeValue.trim();
-    }
-
-    return null;
-  };
 
   if (loading) return <p>로딩 중...</p>;
   if (error) return <p>오류 발생: {error.message}</p>;
 
   return (
     <div className="VarietyList-container">
-      <div className="header-links">
-        <span onClick={() => navigate('/info')} className="header-link">실내정원 식물</span>
-        <span className="header-link-separator"> | </span>
-        <span onClick={() => navigate('/variety-list')} className="header-link">농업기술길잡이</span>
-      </div>
-      <h1 className="VarietyList-title">농업기술길잡이 목록</h1>
+       <div className="header-links">
+          <span onClick={() => navigate('/info')} className="header-link">실내정원 식물</span>
+          <span className="header-link-separator"> | </span>
+          <span onClick={() => navigate('/variety-list')} className="header-link">농업기술길잡이</span>
+        </div>
+        <h1 className="VarietyList-title">농업기술길잡이 목록</h1>
       <ul className="VarietyList-item-list">
         {data.length > 0 ? (
-          data.map((item, index) => (
-            <li key={index} className="VarietyList-item">
-              <img src={item.ebookImg} alt={item.atchmnflGroupEsntlEbookNm || 'eBook 이미지'} />
+          data.map((item) => (
+            <li key={item.ebookCode} className="VarietyList-item">
+              <img src={item.ebookImg} alt={item.atchmnflGroupEsntlEbookNm} />
               <h2>{item.ebookName}</h2>
               <p>{item.stdItemNm}</p>
             </li>
