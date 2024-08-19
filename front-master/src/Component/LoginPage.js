@@ -23,9 +23,11 @@ const LoginPage = () => {
       const response = await fetch('http://10.125.121.180:8080/login', {
         method: 'POST', // POST 메서드를 사용하여 서버에 로그인 데이터 전송
         headers: {
-          'Content-Type': 'application/json',  // 전송할 데이터가 JSON 형식임을 지정
+          'Content-Type': 'application/json',  // 전송할 데이터가 JSON 형식임을 지정 <= 여기서 오류가 발생함.
+          //'Content-Type': 'application/x-www-form-urlencoded', //URL 인코딩된 데이터
         },
         body: JSON.stringify({ username: username, password: password }),  // JSON 형식으로 username과 password를 전송
+        //body: formData.toString(),  // URL 인코딩된 데이터로 전송
       });
 
       // 서버로부터 응답이 성공적일 경우
