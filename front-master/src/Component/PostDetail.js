@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import ImageComponent from '../Component/ImageComponent'; // 이미지 컴포넌트
 import '../CSS/PostDetail.css'; // CSS 파일
 
@@ -18,8 +17,9 @@ const PostDetail = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://10.125.121.180:8080/api/public/freeboard/${freeBoardId}`);
-        setPost(response.data);
+        const response = await fetch(`http://10.125.121.180:8080/api/public/freeboard/${freeBoardId}`);
+        const data = await response.json();
+        setPost(data);
       } catch (error) {
         console.error('Error fetching post:', error);
         setError('게시글을 불러오는 중 오류가 발생했습니다.');
@@ -28,8 +28,9 @@ const PostDetail = () => {
 
     const fetchComments = async () => {
       try {
-        const response = await axios.get(`http://10.125.121.180:8080/api/freecomment?freeBoardId=${freeBoardId}`);
-        setComments(response.data);
+        const response = await fetch(`http://10.125.121.180:8080/api/freecomment?freeBoardId=${freeBoardId}`);
+        const data = await response.json();
+        setComments(data);
       } catch (error) {
         console.error('Error fetching comments:', error);
         setError('댓글 데이터를 가져오는 중 오류가 발생했습니다.');
@@ -44,7 +45,9 @@ const PostDetail = () => {
   const handleDelete = async () => {
     if (window.confirm('게시글을 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`http://10.125.121.180:8080/api/freeboard/${freeBoardId}`);
+        await fetch(`http://10.125.121.180:8080/api/freeboard/${freeBoardId}`, {
+          method: 'DELETE',
+        });
         navigate('/board', { state: { shouldRefetch: true } }); // 삭제 후 게시글 목록 페이지로 이동
       } catch (error) {
         console.error('게시글 삭제 중 오류 발생:', error);
@@ -57,12 +60,19 @@ const PostDetail = () => {
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://10.125.121.180:8080/api/freecomment', {
-        freeBoardId,
-        content: newComment,
-        username: '작성자명' // 여기에 실제 작성자명을 넣어야 합니다.
+      const response = await fetch('http://10.125.121.180:8080/api/freecomment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          freeBoardId,
+          content: newComment,
+          username: '작성자명', // 여기에 실제 작성자명을 넣어야 합니다.
+        }),
       });
-      setComments([...comments, response.data]);
+      const data = await response.json();
+      setComments([...comments, data]);
       setNewComment('');
     } catch (error) {
       console.error('Error submitting comment:', error);
@@ -73,10 +83,17 @@ const PostDetail = () => {
   // 댓글 수정 처리 함수
   const handleCommentEdit = async (commentId) => {
     try {
-      const response = await axios.put(`http://10.125.121.180:8080/api/freecomment/${commentId}`, {
-        content: editCommentContent
+      const response = await fetch(`http://10.125.121.180:8080/api/freecomment/${commentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: editCommentContent,
+        }),
       });
-      setComments(comments.map(comment => (comment.free_comment_id === commentId ? response.data : comment)));
+      const data = await response.json();
+      setComments(comments.map(comment => (comment.free_comment_id === commentId ? data : comment)));
       setEditCommentId(null);
       setEditCommentContent('');
     } catch (error) {
@@ -89,7 +106,9 @@ const PostDetail = () => {
   const handleCommentDelete = async (commentId) => {
     if (window.confirm('댓글을 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`http://10.125.121.180:8080/api/freecomment/${commentId}`);
+        await fetch(`http://10.125.121.180:8080/api/freecomment/${commentId}`, {
+          method: 'DELETE',
+        });
         setComments(comments.filter(comment => comment.free_comment_id !== commentId));
       } catch (error) {
         console.error('Error deleting comment:', error);
@@ -127,9 +146,9 @@ const PostDetail = () => {
           </table>
           <h1 className="post-title">{post.title || '정보 없음'}</h1>
           <p className="post-content">{post.content || '정보 없음'}</p>
-          
-           {/* 이미지 렌더링 부분 - 수정하지 마시오. */}
-           {post.fimges && post.fimges.length > 0 ? (
+
+          {/* 이미지 렌더링 부분 - 수정하지 마시오. */}
+          {post.fimges && post.fimges.length > 0 ? (
             <div className="post-images">
               {post.fimges.map((image, index) => (
                 <ImageComponent key={index} filename={`null${image}`} />
@@ -138,7 +157,7 @@ const PostDetail = () => {
           ) : (
             <p>첨부 파일이 없습니다.</p>
           )}
-          
+
           <button className="back-button" onClick={() => navigate('/board')}>
             돌아가기
           </button>

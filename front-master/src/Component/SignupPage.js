@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Footer from './Footer';
 import '../CSS/SignupPage.css';
 
@@ -15,30 +14,29 @@ const SignupPage = () => {
     e.preventDefault();
 
     try {
-      // 직접 URL을 하드코딩합니다.
-      const response = await axios.post('http://10.125.121.180:8080/public/signup', {
-        username,
-        password,  // 필드명
-        alias: nickname,  // 필드명
-        email,
-        role: 'ROLE_MEMBER',  // 기본 역할 설정
-        enabled: 1,  // 기본 활성화 상태 설정
+      const response = await fetch('http://10.125.121.180:8080/public/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          alias: nickname,
+          email,
+          role: 'ROLE_MEMBER',  // 기본 역할 설정
+          enabled: 1,  // 기본 활성화 상태 설정
+        }),
       });
 
       if (response.status === 201) {
         navigate('/login');
       } else {
-        // 서버에서 반환된 오류 메시지를 처리합니다.
-        alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+        const errorData = await response.json();
+        alert(`회원가입에 실패했습니다: ${errorData.message}`);
       }
     } catch (error) {
-      if (error.response) {
-        alert(`회원가입 실패: ${error.response.data.message}`);
-      } else if (error.request) {
-        alert('서버로부터 응답이 없습니다.');
-      } else {
-        alert('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
-      }
+      alert('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 

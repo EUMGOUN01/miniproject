@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import '../CSS/WritePostPage.css'; // CSS 파일
 
 const WritePostPage = () => {
@@ -67,11 +66,14 @@ const WritePostPage = () => {
       });
 
       // 게시글 데이터와 파일 업로드 요청
-      await axios.post('http://10.125.121.180:8080/api/freeboard', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await fetch('http://10.125.121.180:8080/api/freeboard', {
+        method: 'POST',
+        body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error('게시물을 작성하는 데 실패했습니다.');
+      }
 
       // 작성 완료 후 게시글 목록 페이지로 이동
       navigate('/board', { state: { shouldRefetch: true } });

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import '../CSS/PlantDetail.css';
 
 const PlantDetails = () => {
@@ -24,18 +23,12 @@ const PlantDetails = () => {
       }
 
       try {
-        const response = await axios.get(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`);
-        setPost(response.data);
+        const response = await fetch(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`);
+        const data = await response.json();
+        setPost(data);
       } catch (error) {
-        console.error('게시물 데이터를 가져오는 중 오류 발생:', error.response?.data || error.message);
-        if (error.response) {
-          const { status, data } = error.response;
-          setError(`서버 오류: ${status} - ${JSON.stringify(data)}`);
-        } else if (error.request) {
-          setError('서버 응답이 없습니다.');
-        } else {
-          setError('데이터를 가져오는 중 오류가 발생했습니다.');
-        }
+        console.error('게시물 데이터를 가져오는 중 오류 발생:', error);
+        setError('데이터를 가져오는 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
       }
@@ -45,10 +38,11 @@ const PlantDetails = () => {
       if (!shareBoardId) return;
 
       try {
-        const response = await axios.get(`http://10.125.121.180:8080/api/sharecomment?shareBoardId=${shareBoardId}`);
-        setComments(response.data);
+        const response = await fetch(`http://10.125.121.180:8080/api/sharecomment?shareBoardId=${shareBoardId}`);
+        const data = await response.json();
+        setComments(data);
       } catch (error) {
-        console.error('댓글 데이터를 가져오는 중 오류 발생:', error.response?.data || error.message);
+        console.error('댓글 데이터를 가져오는 중 오류 발생:', error);
         setError('댓글 데이터를 가져오는 중 오류가 발생했습니다.');
       }
     };
@@ -103,19 +97,12 @@ const PlantDetails = () => {
   const handleDelete = async () => {
     if (window.confirm('정말로 이 게시물을 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`);
+        await fetch(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`, { method: 'DELETE' });
         alert('게시물이 삭제되었습니다.');
         navigate('/plant-sharing');
       } catch (error) {
-        console.error('게시물 삭제 중 오류 발생:', error.response?.data || error.message);
-        if (error.response) {
-          const { status, data } = error.response;
-          setError(`서버 오류: ${status} - ${JSON.stringify(data)}`);
-        } else if (error.request) {
-          setError('서버 응답이 없습니다.');
-        } else {
-          setError('게시물을 삭제하는 중 오류가 발생했습니다.');
-        }
+        console.error('게시물 삭제 중 오류 발생:', error);
+        setError('게시물을 삭제하는 중 오류가 발생했습니다.');
       }
     }
   };
@@ -130,28 +117,35 @@ const PlantDetails = () => {
         username: '작성자명', // 실제 사용자명으로 변경 필요
         createdate: new Date().toISOString(),
       };
-      const response = await axios.post('http://10.125.121.180:8080/api/sharecomment', newCommentData);
-      setComments([...comments, response.data]);
+      const response = await fetch('http://10.125.121.180:8080/api/sharecomment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCommentData),
+      });
+      const data = await response.json();
+      setComments([...comments, data]);
       setNewComment('');
     } catch (error) {
-      console.error('댓글 작성 중 오류 발생:', error.response?.data || error.message);
+      console.error('댓글 작성 중 오류 발생:', error);
       setError('댓글을 작성하는 중 오류가 발생했습니다.');
     }
   };
 
   const handleCommentEdit = async (commentId) => {
     try {
-      const updatedComment = {
-        content: editCommentContent
-      };
-      await axios.put(`http://10.125.121.180:8080/api/sharecomment/${commentId}`, updatedComment);
+      const updatedComment = { content: editCommentContent };
+      await fetch(`http://10.125.121.180:8080/api/sharecomment/${commentId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedComment),
+      });
       setComments(comments.map(comment => 
         comment.share_comment_id === commentId ? { ...comment, content: editCommentContent } : comment
       ));
       setEditCommentId(null);
       setEditCommentContent('');
     } catch (error) {
-      console.error('댓글 수정 중 오류 발생:', error.response?.data || error.message);
+      console.error('댓글 수정 중 오류 발생:', error);
       setError('댓글을 수정하는 중 오류가 발생했습니다.');
     }
   };
@@ -159,10 +153,10 @@ const PlantDetails = () => {
   const handleCommentDelete = async (commentId) => {
     if (window.confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`http://10.125.121.180:8080/api/sharecomment/${commentId}`);
+        await fetch(`http://10.125.121.180:8080/api/sharecomment/${commentId}`, { method: 'DELETE' });
         setComments(comments.filter(comment => comment.share_comment_id !== commentId));
       } catch (error) {
-        console.error('댓글 삭제 중 오류 발생:', error.response?.data || error.message);
+        console.error('댓글 삭제 중 오류 발생:', error);
         setError('댓글을 삭제하는 중 오류가 발생했습니다.');
       }
     }

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import '../CSS/WritePostPage.css'; // CSS 파일
 
 const EditPostPage = () => {
@@ -18,8 +17,8 @@ const EditPostPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://10.125.121.180:8080/public/freeboard/${freeBoardId}`);
-        const data = response.data;
+        const response = await fetch(`http://10.125.121.180:8080/public/freeboard/${freeBoardId}`);
+        const data = await response.json();
         setTitle(data.title);
         setCategory(data.type);
         setContent(data.content);
@@ -92,9 +91,15 @@ const EditPostPage = () => {
     });
 
     try {
-      await axios.put(`http://10.125.121.180:8080/api/freeboard`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const response = await fetch(`http://10.125.121.180:8080/api/freeboard`, {
+        method: 'PUT',
+        body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error('게시글을 수정하는 데 실패했습니다.');
+      }
+
       navigate(`/post/${freeBoardId}`, { state: { shouldRefetch: true } });
     } catch (error) {
       console.error('게시글을 수정하는 데 실패했습니다.', error);

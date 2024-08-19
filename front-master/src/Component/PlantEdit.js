@@ -1,8 +1,5 @@
-// PlantEdit.js
-// 식물 나눔 게시판 - 자세히 보기 수정 버튼 클릭시 나오는 페이지
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import '../CSS/PlantDetail.css';
 
 const PlantEdit = () => {
@@ -30,26 +27,20 @@ const PlantEdit = () => {
       }
 
       try {
-        const response = await axios.get(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`);
-        setPost(response.data);
+        const response = await fetch(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`);
+        const data = await response.json();
+        setPost(data);
         setFormData({
-          title: response.data.title,
-          type: response.data.type,
-          username: response.data.username,
-          view: response.data.view,
-          content: response.data.content,
-          adress: response.data.adress
+          title: data.title,
+          type: data.type,
+          username: data.username,
+          view: data.view,
+          content: data.content,
+          adress: data.adress
         });
       } catch (error) {
-        console.error('게시물 데이터를 가져오는 중 오류 발생:', error.response?.data || error.message);
-        if (error.response) {
-          const { status, data } = error.response;
-          setError(`서버 오류: ${status} - ${JSON.stringify(data)}`);
-        } else if (error.request) {
-          setError('서버 응답이 없습니다.');
-        } else {
-          setError('데이터를 가져오는 중 오류가 발생했습니다.');
-        }
+        console.error('게시물 데이터를 가져오는 중 오류 발생:', error);
+        setError('데이터를 가져오는 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
       }
@@ -105,19 +96,23 @@ const PlantEdit = () => {
     setLoading(true);
 
     try {
-      await axios.put(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`, formData);
+      const response = await fetch(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`서버 오류: ${response.status}`);
+      }
+
       alert('게시물이 성공적으로 업데이트되었습니다.');
       navigate(`/plant-sharing/${shareBoardId}`);
     } catch (error) {
-      console.error('게시물 업데이트 중 오류 발생:', error.response?.data || error.message);
-      if (error.response) {
-        const { status, data } = error.response;
-        setError(`서버 오류: ${status} - ${JSON.stringify(data)}`);
-      } else if (error.request) {
-        setError('서버 응답이 없습니다.');
-      } else {
-        setError('데이터를 업데이트하는 중 오류가 발생했습니다.');
-      }
+      console.error('게시물 업데이트 중 오류 발생:', error);
+      setError('데이터를 업데이트하는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }

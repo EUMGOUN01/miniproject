@@ -1,9 +1,6 @@
-// PlantSharingBoard.js
-// 식물 나눔 게시판 - db에서 불러온 게시글 보여주는 페이지
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CiSearch } from 'react-icons/ci';
-import axios from 'axios';
 import '../CSS/PlantSharingBoard.css';
 import Footer from './Footer';
 
@@ -20,10 +17,9 @@ const PlantSharingBoard = () => {
     const fetchBoardData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://10.125.121.180:8080/public/shareboard', {
-          params: { page: currentPage - 1, size: postsPerPage }
-        });
-        setBoardData(response.data);
+        const response = await fetch(`http://10.125.121.180:8080/public/shareboard?page=${currentPage - 1}&size=${postsPerPage}`);
+        const data = await response.json();
+        setBoardData(data);
       } catch (error) {
         setError('데이터를 가져오는 중 오류가 발생했습니다.');
         console.error('데이터를 가져오는 중 오류가 발생했습니다:', error);

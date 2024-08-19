@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
+//import { getImageUrl } from '../Component/utils'; // 이미지 저장 경로 불러오기
 
-const ImageComponent = ({ fimgid }) => {
+const ImageComponent = ({ filename }) => {
     const [imageUrl, setImageUrl] = useState('');
+    const imgPath = 'http://10.125.121.180:8080/photos/' ; 
+    console.log('ImageComponent filename' ,filename  ) ;
 
     useEffect(() => {
-        // fimgid로 이미지 URL을 설정합니다.
-        if (fimgid) {
-            setImageUrl(`http://10.125.121.180:8080/photos/${fimgid}`);
-        }
-    }, [fimgid]);
+        // 이미지 URL을 설정합니다.
+        // setImageUrl(getImageUrl(filename));
+        setImageUrl(imgPath+filename)
+    }, [filename]);
 
     return (
         <div>
             {imageUrl ? (
-                <img src={imageUrl} alt={`이미지 ID: ${fimgid}`} />
+                <img src={imageUrl} alt={filename} />
             ) : (
                 <p>이미지를 로드하는 중입니다...</p>
             )}
