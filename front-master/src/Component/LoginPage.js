@@ -4,6 +4,7 @@
 // 로그인 성공시 Header 에서 변화가 있어야함.
 
 // 토큰 저장 localStorage에 토큰 저장하여 사용.
+// 쿠키 사용도 고려해보기
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
