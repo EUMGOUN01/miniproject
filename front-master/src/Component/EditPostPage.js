@@ -1,5 +1,4 @@
 // EditPostPage.js
-// 자유게시판 수정글
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../CSS/WritePostPage.css'; // CSS 파일
@@ -19,12 +18,11 @@ const EditPostPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://10.125.121.180:8080/public/freeboard/${freeBoardId}`);
+        const response = await fetch(`http://10.125.121.180:8080/api/public/freeboard/${freeBoardId}`);
         const data = await response.json();
         setTitle(data.title);
         setCategory(data.type);
         setContent(data.content);
-        // 서버로부터 파일 ID(fimgid)를 받아와 처리
         setFiles(data.fimges ? data.fimges.map(file => ({
           fimgid: file.fimgid,
           name: file.fimgoriname, // 원본 파일 이름
@@ -93,7 +91,7 @@ const EditPostPage = () => {
     });
 
     try {
-      const response = await fetch(`http://10.125.121.180:8080/api/freeboard`, {
+      const response = await fetch(`http://10.125.121.180:8080/api/public/freeboard/${freeBoardId}`, {
         method: 'PUT',
         body: formData,
       });
