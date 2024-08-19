@@ -1,4 +1,3 @@
-// EditPostPage.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../CSS/WritePostPage.css'; // CSS 파일
@@ -12,6 +11,7 @@ const EditPostPage = () => {
   const [content, setContent] = useState(''); // 게시글 내용 상태
   const [files, setFiles] = useState([]); // 첨부 파일 상태
   const [removedFiles, setRemovedFiles] = useState([]); // 삭제된 파일 상태
+  const [privateType, setPrivateType] = useState('public'); // 전체보기/나만보기 상태
   const [error, setError] = useState(''); // 오류 메시지 상태
 
   // 게시글 데이터를 불러오는 함수
@@ -23,6 +23,7 @@ const EditPostPage = () => {
         setTitle(data.title);
         setCategory(data.type);
         setContent(data.content);
+        setPrivateType(data.privateType || 'public'); // 게시글의 보기 설정 값 가져오기
         setFiles(data.fimges ? data.fimges.map(file => ({
           fimgid: file.fimgid,
           name: file.fimgoriname, // 원본 파일 이름
@@ -76,7 +77,7 @@ const EditPostPage = () => {
     const formData = new FormData();
     formData.append('freeboarddata', new Blob([JSON.stringify({
       freeBoardId,
-      privateType: 'public',
+      privateType,
       type: category,
       title,
       content,
@@ -86,23 +87,37 @@ const EditPostPage = () => {
     // 새로 추가된 파일만 업로드
     files.forEach(file => {
       if (!file.existing && file.file) {
-        formData.append('files', file.file);
+        formData.append('files', file.file); // file 객체 자체를 추가합니다.
       }
     });
 
+    // JWT 토큰 가져오기
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+
     try {
-      const response = await fetch(`http://10.125.121.180:8080/api/public/freeboard/${freeBoardId}`, {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/${freeBoardId}`, {
         method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+        },
         body: formData,
       });
 
       if (!response.ok) {
+        const responseData = await response.json();
+        console.error('Response error data:', responseData);
         throw new Error('게시글을 수정하는 데 실패했습니다.');
       }
 
       navigate(`/post/${freeBoardId}`, { state: { shouldRefetch: true } });
     } catch (error) {
-      console.error('게시글을 수정하는 데 실패했습니다.', error);
+      console.error('게시글을 수정하는 데 실패했습니다:', error);
       setError('게시글을 수정하는 데 실패했습니다.');
     }
   };
@@ -126,6 +141,21 @@ const EditPostPage = () => {
             </select>
           </label>
         </div>
+
+        <div className="form-group">
+          <label className="label">
+            보기 설정:
+            <select
+              value={privateType}
+              onChange={(e) => setPrivateType(e.target.value)}
+              className="write-select"
+            >
+              <option value="public">전체보기</option>
+              <option value="private">나만보기</option>
+            </select>
+          </label>
+        </div>
+
         <label className="label">
           제목:
           <input

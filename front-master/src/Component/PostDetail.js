@@ -6,61 +6,50 @@ import '../CSS/PostDetail.css'; // CSS 파일
 const PostDetail = () => {
   const { freeBoardId } = useParams();
   const navigate = useNavigate();
-  const freeBoardIdAsNumber = Number(freeBoardId); // freeBoardId를 숫자로 변환
-
   const [post, setPost] = useState(null);
   const [newComment, setNewComment] = useState('');
-  const [username, setUsername] = useState(localStorage.getItem('username') || ''); // 로컬 스토리지에서 사용자 이름 가져오기
   const [replyCommentId, setReplyCommentId] = useState(null); // 대댓글 작성할 댓글 ID
   const [replyContent, setReplyContent] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState(null); // 수정할 댓글 ID
+  const [editContent, setEditContent] = useState(''); // 수정할 댓글 내용
   const [error, setError] = useState('');
-
-  // 토큰 유무를 확인하는 함수
-  const isAuthenticated = () => {
-    const token = localStorage.getItem('token');
-    return !!token;
-  };
-
-  // 인증되지 않은 사용자를 로그인 페이지로 리다이렉트
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      navigate('/login');
-    }
-  }, [navigate]);
 
   // DB에서 게시글 데이터를 가져오는 함수
   const fetchPost = useCallback(async () => {
     try {
-      const response = await fetch(`http://10.125.121.180:8080/api/public/freeboard/${freeBoardIdAsNumber}`);
+      const response = await fetch(`http://10.125.121.180:8080/api/public/freeboard/${freeBoardId}`);
       const data = await response.json();
+      console.log('Fetched post data:', data); // 데이터 확인
       setPost(data);
       setError(null);
     } catch (error) {
       setError('게시글을 불러오는 중 오류가 발생했습니다.');
     }
-  }, [freeBoardIdAsNumber]);
+  }, [freeBoardId]);
 
   useEffect(() => {
-    if (isAuthenticated()) {
-      fetchPost();
-    }
+    fetchPost();
   }, [fetchPost]);
 
   // 댓글 작성 처리 함수
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
 
-    if (newComment.length > 45 || username.length > 10) {
-      setError('댓글 내용은 최대 45자, 사용자명은 최대 10자까지 입력 가능합니다.');
+    const username = localStorage.getItem('username'); // username 가져오기
+    if (!username) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
       return;
     }
 
     const newCommentData = {
       content: newComment,
-      username: username,
       createDate: new Date(),
       parentId: null,
-      freeBoardId: freeBoardIdAsNumber,
+      fcchildlist: [],
+      deleted: false,
+      freeBoardId: freeBoardId,
+      username: username, // username 추가
     };
 
     const token = localStorage.getItem('token'); // 저장된 토큰 가져오기
@@ -72,7 +61,7 @@ const PostDetail = () => {
     }
 
     try {
-      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/${freeBoardIdAsNumber}/freecomment`, {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/${freeBoardId}/freecomment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,21 +81,25 @@ const PostDetail = () => {
     }
   };
 
-  // 대댓글 작성 처리 함수
+  // 대댓글을 부모 댓글에 추가하는 함수
   const handleReplySubmit = async (e, parentId) => {
     e.preventDefault();
 
-    if (replyContent.length > 45) {
-      setError('대댓글 내용은 최대 45자까지 입력 가능합니다.');
+    const username = localStorage.getItem('username'); // username 가져오기
+    if (!username) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
       return;
     }
 
     const newReply = {
       content: replyContent,
-      username: username,
       createDate: new Date(),
       parentId: parentId,
-      freeBoardId: freeBoardIdAsNumber,
+      fcchildlist: [],
+      deleted: false,
+      freeBoardId: freeBoardId,
+      username: username, // username 추가
     };
 
     const token = localStorage.getItem('token'); // 저장된 토큰 가져오기
@@ -118,7 +111,7 @@ const PostDetail = () => {
     }
 
     try {
-      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/${freeBoardIdAsNumber}/freecomment`, {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/${freeBoardId}/freecomment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -133,6 +126,47 @@ const PostDetail = () => {
       setReplyCommentId(null); // 대댓글 폼 닫기
     } catch (error) {
       setError('대댓글 등록 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 댓글 수정 클릭 핸들러
+  const handleEditClick = (commentId, content) => {
+    setEditingCommentId(commentId);
+    setEditContent(content);
+  };
+
+  // 댓글 수정 처리 함수
+  const handleEditSubmit = async (e, commentId) => {
+    e.preventDefault();
+
+    const updatedComment = {
+      content: editContent,
+      createDate: new Date(),
+    };
+
+    const token = localStorage.getItem('token'); // 저장된 토큰 가져오기
+
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/freecomment/${commentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+        },
+        body: JSON.stringify(updatedComment),
+      });
+
+      if (!response.ok) throw new Error('댓글 수정 실패');
+      await fetchPost(); // 수정 후 게시글 다시 불러오기
+      setEditingCommentId(null); // 수정 모드 종료
+    } catch (error) {
+      setError('댓글 수정 중 오류가 발생했습니다.');
     }
   };
 
@@ -169,11 +203,26 @@ const PostDetail = () => {
           <p className="deleted-comment">삭제된 댓글입니다.</p>
         ) : (
           <>
-            <p>{comment.content}</p>
-            <span>{comment.username}</span>
-            <span>{new Date(comment.createDate).toLocaleDateString()}</span>
-            <button onClick={() => handleDelete(comment.freeCommentId)}>삭제</button>
-            <button onClick={() => setReplyCommentId(comment.freeCommentId)}>대댓글 작성</button>
+            {editingCommentId === comment.freeCommentId ? (
+              <form onSubmit={(e) => handleEditSubmit(e, comment.freeCommentId)}>
+                <textarea
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  required
+                />
+                <button type="submit">저장</button>
+                <button type="button" onClick={() => setEditingCommentId(null)}>취소</button>
+              </form>
+            ) : (
+              <>
+                <p>{comment.content}</p>
+                <span>{comment.username || '알 수 없음'}</span> {/* 서버에서 받은 username을 표시 */}
+                <span>{new Date(comment.createDate).toLocaleDateString()}</span>
+                <button onClick={() => handleEditClick(comment.freeCommentId, comment.content)}>수정</button>
+                <button onClick={() => handleDelete(comment.freeCommentId)}>삭제</button>
+                <button onClick={() => setReplyCommentId(comment.freeCommentId)}>대댓글 작성</button>
+              </>
+            )}
 
             {/* 대댓글 작성 폼 */}
             {replyCommentId === comment.freeCommentId && (
@@ -202,7 +251,7 @@ const PostDetail = () => {
 
   return (
     <div className="post-detail-container">
-      {error && <p className="error-message">{error}</p>} {/* 오류 메시지 표시 */}
+      {error && <p className="error-message">{error}</p>}
       {post ? (
         <div>
           <table className="post-detail-table">
@@ -222,7 +271,7 @@ const PostDetail = () => {
                 <td>{post.type || '정보 없음'}</td>
                 <td>{post.title || '정보 없음'}</td>
                 <td>{post.username || '알 수 없음'}</td>
-                <td>{post.createDate ? new Date(post.createDate).toLocaleDateString() : '정보 없음'}</td>
+                <td>{new Date(post.createDate).toLocaleDateString()}</td>
                 <td>{post.view || '정보 없음'}</td>
               </tr>
             </tbody>
@@ -230,52 +279,51 @@ const PostDetail = () => {
           <h1 className="post-title">{post.title || '정보 없음'}</h1>
           <p className="post-content">{post.content || '정보 없음'}</p>
 
-            {/* 이미지 렌더링 */}
-            {post.fimges && post.fimges.length > 0 ? (
-              <div className="post-images">
-                {post.fimges.map((image, index) => (
-                  <ImageComponent key={index} filename={`null${image}`} />
-                ))}
-              </div>
-            ) : (
-              <p>첨부 파일이 없습니다.</p>
-            )}
-
-            <button className="back-button" onClick={() => navigate('/board')}>돌아가기</button>
-            <Link to={`/edit/${post.freeBoardId}`} className="edit-button">수정하기</Link>
-            <button className="delete-button" onClick={() => navigate('/board')}>삭제하기</button>
-
-            {/* 댓글 섹션 */}
-            <div className="comments-section">
-              <h2>댓글</h2>
-              <form onSubmit={handleCommentSubmit}>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="작성자명을 입력하세요"
-                  required
-                />
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="댓글을 입력하세요"
-                  required
-                />
-                <button type="submit">댓글 작성</button>
-              </form>
-              {post.fcomts && post.fcomts.length > 0 ? (
-                renderComments(post.fcomts)
-              ) : (
-                <p>댓글이 없습니다.</p>
-              )}
+          {/* 이미지 렌더링 */}
+          {post.fimges && post.fimges.length > 0 ? (
+            <div className="post-images">
+              {post.fimges.map((image, index) => (
+                <ImageComponent key={index} filename={`null${image}`} />
+              ))}
             </div>
+          ) : (
+            <p>첨부 파일이 없습니다.</p>
+          )}
+
+          <button className="back-button" onClick={() => navigate('/board')}>
+            돌아가기
+          </button>
+          <Link to={`/edit/${post.freeBoardId}`} className="edit-button">
+            수정하기
+          </Link>
+          <button className="delete-button" onClick={() => navigate('/board')}>
+            삭제하기
+          </button>
+
+          {/* 댓글 섹션 */}
+          <div className="comments-section">
+            <h2>댓글</h2>
+            <form onSubmit={handleCommentSubmit}>
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="댓글을 입력하세요"
+                required
+              />
+              <button type="submit">댓글 작성</button>
+            </form>
+            {post.fcomts && post.fcomts.length > 0 ? (
+              renderComments(post.fcomts)
+            ) : (
+              <p>댓글이 없습니다.</p>
+            )}
           </div>
-        ) : (
-          <p>게시글을 로드하는 중입니다...</p>
-        )}
-      </div>
-    );
-  };
+        </div>
+      ) : (
+        <p>게시글을 로드하는 중입니다...</p>
+      )}
+    </div>
+  );
+};
 
 export default PostDetail;

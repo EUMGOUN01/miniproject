@@ -11,14 +11,17 @@ const BoardPage = () => {
   const [boardData, setBoardData] = useState([]);
   const [searchQuery, setSearchQuery] = useState(''); // 현재 입력된 검색어 상태
   const [appliedSearchQuery, setAppliedSearchQuery] = useState(''); // 실제로 적용된 검색어 상태
-  const [selectedCategory, setSelectedCategory] = useState(''); // 추가된 카테고리 상태
+  const [selectedCategory, setSelectedCategory] = useState(''); // 카테고리 상태
+  const [privateType, setPrivateType] = useState('public'); // 전체보기/나만보기 상태
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // 카테고리와 privateType을 배열로 미리 정의
   const categories = ['질문', '수다']; // 카테고리 리스트
+  const privateTypes = ['public', 'private']; // 전체보기/나만보기 리스트
 
   const fetchBoardData = async (page, size) => {
     setLoading(true);
@@ -50,14 +53,16 @@ const BoardPage = () => {
       setSearchQuery('');
       setAppliedSearchQuery('');
       setSelectedCategory('');
+      setPrivateType('public'); // 페이지 이동 시 기본 privateType 설정
     }
   }, [location.pathname]);
 
   const filteredPosts = useMemo(() => {
     return boardData
       .filter(post => post.title.toLowerCase().includes(appliedSearchQuery.toLowerCase())) // 실제 적용된 검색어에 따라 필터링
-      .filter(post => (selectedCategory ? post.type === selectedCategory : true)); // 카테고리 필터
-  }, [boardData, appliedSearchQuery, selectedCategory]);
+      .filter(post => (selectedCategory ? post.type === selectedCategory : true)) // 카테고리 필터
+      .filter(post => post.privateType === privateType); // privateType 필터링 추가
+  }, [boardData, appliedSearchQuery, selectedCategory, privateType]);
 
   const indexOfLastPost = (currentPage + 1) * pageSize;
   const indexOfFirstPost = indexOfLastPost - pageSize;
@@ -89,6 +94,19 @@ const BoardPage = () => {
           <h1>자유 게시판</h1>
           <div className="board-search-container">
             <div className="board-search-wrapper">
+              {/* privateType 선택 드롭다운 */}
+              <select
+                value={privateType}
+                onChange={(e) => setPrivateType(e.target.value)}
+                className="board-private-select"
+              >
+                {privateTypes.map((type, index) => (
+                  <option key={index} value={type}>
+                    {type === 'public' ? '전체보기' : '나만보기'}
+                  </option>
+                ))}
+              </select>
+              
               {/* 카테고리 선택 드롭다운 */}
               <select
                 value={selectedCategory}

@@ -12,9 +12,16 @@ const WritePostPage = () => {
   const [error, setError] = useState(''); // 오류 메시지 상태
   const [postId, setPostId] = useState(null); // 게시글 ID 상태
   const [existingFiles, setExistingFiles] = useState([]); // 기존 파일 상태
+  const [privateType, setPrivateType] = useState('public'); // 전체보기/나만보기 상태
 
-  // 게시글 수정 모드일 때, 게시글 데이터 로드
   useEffect(() => {
+    // 로그인 상태 확인
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인 후에 게시글을 작성할 수 있습니다.');
+      navigate('/login'); // 로그인 페이지로 리디렉션
+    }
+
     const fetchPost = async () => {
       // 게시글 수정 모드일 때만 데이터 로드
       if (postId) {
@@ -24,6 +31,7 @@ const WritePostPage = () => {
           setTitle(data.title);
           setCategory(data.type);
           setContent(data.content);
+          setPrivateType(data.privateType);
           setExistingFiles(data.fimges ? data.fimges.map(file => ({
             fimgid: file.fimgid,
             name: file.fimgoriname, // 원본 파일 이름
@@ -36,7 +44,7 @@ const WritePostPage = () => {
       }
     };
     fetchPost();
-  }, [postId]);
+  }, [postId, navigate]);
 
   // 파일 선택 시 호출되는 함수
   const handleFileChange = (e) => {
@@ -83,7 +91,7 @@ const WritePostPage = () => {
 
     const formData = new FormData();
     formData.append('freeboarddata', new Blob([JSON.stringify({
-      privateType: 'public',
+      privateType, // privateType 선택 추가
       type: category,
       title,
       content,
@@ -97,8 +105,12 @@ const WritePostPage = () => {
     });
 
     try {
+      const token = localStorage.getItem('token');  // 토큰 가져오기
       const response = await fetch('http://10.125.121.180:8080/api/users/freeboard', {
-        method: postId ? 'PUT' : 'POST', // 수정 모드일 때 PUT 요청
+        method: postId ? 'PUT' : 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,  // 인증 토큰 추가
+        },
         body: formData,
       });
 
@@ -132,6 +144,21 @@ const WritePostPage = () => {
             </select>
           </label>
         </div>
+
+        <div className="form-group">
+          <label className="label">
+            보기 설정:
+            <select
+              value={privateType}
+              onChange={(e) => setPrivateType(e.target.value)}
+              className="write-select"
+            >
+              <option value="public">전체보기</option>
+              <option value="private">나만보기</option>
+            </select>
+          </label>
+        </div>
+
         <label className="label">
           제목:
           <input

@@ -32,7 +32,7 @@ const useFetch = (url) => {
 };
 
 export const useGardenList = (apiKey) => {
-  const url = `/service/garden/gardenList?apiKey=${apiKey}`;
+  const url = `/service/garden/gardenList?apiKey=${apiKey}&pageNo=1&numOfRows=217`;
   return useFetch(url);
 };
 
