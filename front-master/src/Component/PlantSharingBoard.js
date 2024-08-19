@@ -17,7 +17,7 @@ const PlantSharingBoard = () => {
     const fetchBoardData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://10.125.121.180:8080/public/shareboard?page=${currentPage - 1}&size=${postsPerPage}`);
+        const response = await fetch(`http://10.125.121.180:8080/api/public/shareboard?page=${currentPage - 1}&size=${postsPerPage}`);
         const data = await response.json();
         setBoardData(data);
       } catch (error) {
