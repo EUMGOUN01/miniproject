@@ -49,9 +49,10 @@ const VarietyList = () => {
 
   // XML을 JSON으로 변환하는 함수
   const xmlToJson = (xml) => {
-    const obj = {};
+    if (xml.nodeType === 1) { // 요소 노드
+      const obj = {};
 
-    if (xml.nodeType === 1) { // 요소 노드일 경우
+      // 요소의 속성 가져오기
       if (xml.attributes.length > 0) {
         obj["@attributes"] = {};
         for (let j = 0; j < xml.attributes.length; j++) {
@@ -59,26 +60,29 @@ const VarietyList = () => {
           obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
         }
       }
-    } else if (xml.nodeType === 3 && xml.nodeValue.trim()) { // 텍스트 노드일 경우
+
+      // 자식 노드 처리
+      if (xml.hasChildNodes()) {
+        for (let i = 0; i < xml.childNodes.length; i++) {
+          const item = xml.childNodes.item(i);
+          const nodeName = item.nodeName;
+          if (typeof obj[nodeName] === "undefined") {
+            obj[nodeName] = xmlToJson(item);
+          } else {
+            if (!Array.isArray(obj[nodeName])) {
+              obj[nodeName] = [obj[nodeName]];
+            }
+            obj[nodeName].push(xmlToJson(item));
+          }
+        }
+      }
+
+      return obj;
+    } else if (xml.nodeType === 3 && xml.nodeValue.trim()) { // 텍스트 노드
       return xml.nodeValue.trim();
     }
 
-    if (xml.hasChildNodes()) {
-      for (let i = 0; i < xml.childNodes.length; i++) {
-        const item = xml.childNodes.item(i);
-        const nodeName = item.nodeName;
-        if (typeof obj[nodeName] === "undefined") {
-          obj[nodeName] = xmlToJson(item);
-        } else {
-          if (!Array.isArray(obj[nodeName])) {
-            obj[nodeName] = [obj[nodeName]];
-          }
-          obj[nodeName].push(xmlToJson(item));
-        }
-      }
-    }
-
-    return obj;
+    return null;
   };
 
   if (loading) return <p>로딩 중...</p>;
@@ -94,8 +98,8 @@ const VarietyList = () => {
       <h1 className="VarietyList-title">농업기술길잡이 목록</h1>
       <ul className="VarietyList-item-list">
         {data.length > 0 ? (
-          data.map((item) => (
-            <li key={item.ebookCode} className="VarietyList-item">
+          data.map((item, index) => (
+            <li key={index} className="VarietyList-item">
               <img src={item.ebookImg} alt={item.atchmnflGroupEsntlEbookNm || 'eBook 이미지'} />
               <h2>{item.ebookName}</h2>
               <p>{item.stdItemNm}</p>

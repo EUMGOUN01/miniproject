@@ -11,19 +11,15 @@ const InfoPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleCloseModal = () => setSelectedPlant(null);
-
   const handlePlantClick = (cntntsNo) => setSelectedPlant(cntntsNo);
+  const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
   const { data: plantData, loading: plantLoading, error: plantError } = usePlantDetail(apiKey, selectedPlant);
 
-  const handleSearchChange = (e) => setSearchTerm(e.target.value);
-
+  // 검색어에 따른 필터링된 데이터
   const filteredGardenData = gardenData?.response?.body?.items?.item?.filter(garden =>
     garden.cntntsSj.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  if (gardenLoading) return <p>로딩 중...</p>;
-  if (gardenError) return <p>에러 발생: {gardenError}</p>;
 
   return (
     <div className="garden-body">
@@ -44,16 +40,29 @@ const InfoPage = () => {
           <button>검색</button>
         </div>
       </div>
-      <div className="garden-list">
-        {filteredGardenData && filteredGardenData.map((garden) => (
-          <div className="garden-card" key={garden.cntntsNo}>
-            <p><strong>{garden.cntntsSj}</strong></p>
-            <p><strong>{garden.cntntsNo}</strong></p>
-            <button onClick={() => handlePlantClick(garden.cntntsNo)}>상세 보기</button>
-          </div>
-        ))}
-      </div>
 
+      {/* 로딩 및 에러 처리 */}
+      {gardenLoading ? (
+        <p>로딩 중...</p>
+      ) : gardenError ? (
+        <p>에러 발생: {gardenError}</p>
+      ) : (
+        <div className="garden-list">
+          {filteredGardenData.length > 0 ? (
+            filteredGardenData.map((garden) => (
+              <div className="garden-card" key={garden.cntntsNo}>
+                <p><strong>{garden.cntntsSj}</strong></p>
+                <p>{garden.cntntsNo}</p>
+                <button onClick={() => handlePlantClick(garden.cntntsNo)}>상세 보기</button>
+              </div>
+            ))
+          ) : (
+            <p>검색된 결과가 없습니다.</p>
+          )}
+        </div>
+      )}
+
+      {/* 선택된 식물이 있을 때만 모달 렌더링 */}
       {selectedPlant && (
         <div className="garden-modal">
           <div className="garden-modal-content">
@@ -67,7 +76,7 @@ const InfoPage = () => {
                 <div>
                   <p><strong>이름:</strong> {plantData.distbNm}</p>
                   <p><strong>콘텐츠 번호:</strong> {plantData.cntntsNo}</p>
-                  {/* 추가 정보 표시 */}
+                  {/* 추가 정보 */}
                 </div>
               )
             )}
