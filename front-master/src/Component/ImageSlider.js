@@ -1,3 +1,4 @@
+// 메인 페이지 이미지 배너 넘어가는 기능
 import React, { useState, useEffect } from 'react';
 import '../CSS/ImageSlider.css'; // CSS 파일 import
 

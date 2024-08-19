@@ -1,3 +1,6 @@
+// hooks.js
+// 소문자 파일이라서 사용 안함.
+// 제거할것.
 import { useState, useEffect } from 'react';
 
 // 데이터 가져오기 훅

@@ -1,3 +1,5 @@
+// EditPostPage.js
+// 자유게시판 수정글
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../CSS/WritePostPage.css'; // CSS 파일

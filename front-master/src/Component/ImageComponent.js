@@ -1,3 +1,4 @@
+// 이미지 파일 코드
 import React, { useState, useEffect } from 'react';
 //import { getImageUrl } from '../Component/utils'; // 이미지 저장 경로 불러오기
 

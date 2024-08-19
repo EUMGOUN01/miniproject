@@ -1,3 +1,5 @@
+// BoardPage.js
+// 자유게시판 목록 보여줌.
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CiSearch } from 'react-icons/ci';

@@ -1,3 +1,6 @@
+// jwt 방식
+// LoginPage.js
+// 로그인 페이지
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';

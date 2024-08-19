@@ -1,3 +1,5 @@
+//CommunityGardenPage.js
+// 공용텃밭 보여주는 페이지
 import React from 'react';
 import { Map, MapMarker, MapInfoWindow } from 'react-kakao-maps-sdk';
 import { HiArrowCircleRight } from 'react-icons/hi';

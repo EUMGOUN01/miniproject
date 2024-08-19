@@ -1,3 +1,5 @@
+// Homepage.js
+// 메인 페이지
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaChevronRight } from 'react-icons/fa6'; // 아이콘 import
