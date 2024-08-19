@@ -1,6 +1,10 @@
 // jwt 방식
 // LoginPage.js
 // 로그인 페이지
+// 로그인 성공시 Header 에서 변화가 있어야함.
+
+// 토큰 저장 localStorage에 토큰 저장하여 사용.
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
@@ -15,7 +19,6 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      // 서버로 로그인 요청 보내기
       const response = await fetch('http://10.125.121.180:8080/login', {
         method: 'POST',
         headers: {
@@ -24,11 +27,11 @@ const LoginPage = () => {
         body: JSON.stringify({ username, password }),
       });
 
-      // 응답의 상태 코드만으로 성공 여부 판단
       if (response.ok) {
-        // 로그인 성공 처리 (별도의 응답 데이터 없음)
+        const data = await response.json();
+        const token = data.token;  // 서버에서 JWT 토큰을 받았다고 가정
+        localStorage.setItem('token', token);  // 토큰을 로컬 스토리지에 저장
         alert('로그인 성공!');
-        // 메인 페이지로 이동
         navigate('/');
       } else if (response.status === 401) {
         alert('아이디 또는 비밀번호가 잘못되었습니다.');

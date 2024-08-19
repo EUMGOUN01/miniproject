@@ -7,13 +7,25 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);  // 로그인 상태 관리
 
   useEffect(() => {
-    // 로컬 스토리지에서 토큰 확인하여 로그인 상태 설정
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);  // 토큰이 있으면 로그인 상태로 설정
   }, []);
 
+  useEffect(() => {
+    // 로그인/로그아웃 시 상태를 감지할 수 있도록 이벤트 리스너 추가
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('token');
+      setIsLoggedIn(!!token);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   const handleLogout = () => {
-    // 로그아웃 시 토큰 삭제하고 로그인 상태 변경
     localStorage.removeItem('token');
     setIsLoggedIn(false);
     alert('로그아웃 되었습니다.');
