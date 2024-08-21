@@ -99,16 +99,7 @@ const PlantSharingBoard = () => {
           <h1>식물 나눔 게시판</h1>
           <div className="plant-sharing-board-search-container">
             <div className="plant-sharing-board-search-wrapper">
-              <select
-                value={privateType}
-                onChange={(e) => setPrivateType(e.target.value)}
-                className="board-private-select"
-                disabled={!isLoggedIn && privateType === 'private'}
-              >
-                <option value="public">전체보기</option>
-                {isLoggedIn && <option value="private">나만보기</option>}
-              </select>
-
+              
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}

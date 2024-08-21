@@ -40,7 +40,7 @@ const PlantEdit = () => {
         setFiles(data.simges ? data.simges.map(file => ({
           simgid: file.simgid,
           name: file.simgoriname,
-          url: `http://10.125.121.180:8080/photos/${file.simges}`,
+          url: `http://10.125.121.180:8080/photos/${file.simgid}`,
           existing: true,
         })) : []);
       } catch (error) {
@@ -131,7 +131,7 @@ const PlantEdit = () => {
   // 폼 제출 시 호출되는 함수
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted with:', { title, category, content, address, files, removedFiles });
+    console.log('Form submitted with:', { shareBoardId, title, category, content, address, files, removedFiles });
 
     if (!title || !content) {
       setError('제목과 내용을 입력해야 합니다.');
@@ -140,7 +140,7 @@ const PlantEdit = () => {
 
     // 식물 나눔 게시판 데이터
     const formData = new FormData();
-    formData.append('shareBoarddata', new Blob([JSON.stringify({
+    formData.append('shareboarddata', new Blob([JSON.stringify({
       shareBoardId,
       privateType,
       type: category,
@@ -182,7 +182,7 @@ const PlantEdit = () => {
       }
 
       console.log('Post updated successfully.');
-      navigate(`/post/${shareBoardId}`, { state: { shouldRefetch: true } });
+      navigate(`/plant-sharing/${shareBoardId}`, { state: { shouldRefetch: true } });
     } catch (error) {
       console.error('게시글을 수정하는 데 실패했습니다:', error);
       setError('게시글을 수정하는 데 실패했습니다.');
@@ -210,19 +210,7 @@ const PlantEdit = () => {
           </label>
         </div>
 
-        <div className="form-group">
-          <label className="label">
-            보기 설정:
-            <select
-              value={privateType}
-              onChange={(e) => setPrivateType(e.target.value)}
-              className="write-select"
-            >
-              <option value="public">전체보기</option>
-              <option value="private">나만보기</option>
-            </select>
-          </label>
-        </div>
+
 
         <label className="label">
           제목:

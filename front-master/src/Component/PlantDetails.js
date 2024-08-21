@@ -400,7 +400,7 @@ const PlantDetail = () => {
         )}
 
           <div className="post-actions">
-            <button className="back-button" onClick={() => navigate('/board')}>돌아가기</button>
+            <button className="back-button" onClick={() => navigate('/plant-sharing')}>돌아가기</button>
             
             {loggedInUsername === post.username && (
               <>
