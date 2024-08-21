@@ -1,0 +1,39 @@
+/* Modal.css */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 모달을 화면 위에 표시하기 위해 높은 z-index 사용 */
+  }
+  
+  .modal {
+    background-color: white;
+    padding: 40px; /* 모달 내부 여백 추가 */
+    border-radius: 5px; /* 둥근 모서리 크기 조정 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 80%; /* 가로 크기 80%로 설정 (화면 크기에 맞게 비율로 조정) */
+    max-width: 500px; /* 최대 너비를 500px로 제한 */
+    max-height: 80vh; /* 최대 높이를 화면 높이의 80%로 설정 */
+    overflow-y: auto; /* 높이를 넘는 내용이 있을 경우 스크롤 생성 */
+  }
+  
+  .modal-close-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #0F2C22;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px; /* 버튼 모서리 둥글게 설정 */
+  }
+  
+  .modal-close-button:hover {
+    background-color: #185a43;
+  }

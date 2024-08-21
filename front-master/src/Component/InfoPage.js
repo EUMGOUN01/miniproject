@@ -27,11 +27,11 @@ const InfoPage = () => {
   return (
     <div className="garden-body">
       <div className="header-container">
-        <div className="header-links">
+        {/* <div className="header-links">
           <span onClick={() => navigate('/info')} className="header-link">실내정원 식물</span>
           <span className="header-link-separator"> | </span>
           <span onClick={() => navigate('/variety-list')} className="header-link">농업기술길잡이</span>
-        </div>
+        </div> */}
         <h1 className="garden-title move-left">실내정원 식물</h1>
         <div className="search-container">
           <input
@@ -46,8 +46,12 @@ const InfoPage = () => {
       <div className="garden-list">
         {filteredGardenData && filteredGardenData.map((garden) => (
           <div className="garden-card" key={garden.cntntsNo}>
+            <img 
+              src={garden.rtnThumbFileUrl.split('|')[0]} 
+              alt="Image Thumbnail" 
+            />
             <p><strong>{garden.cntntsSj}</strong></p>
-            <p><strong></strong>{garden.cntntsNo}</p>
+            <p><strong>{garden.cntntsNo}</strong></p>
             <button onClick={() => handlePlantClick(garden.cntntsNo)}>상세 보기</button>
           </div>
         ))}

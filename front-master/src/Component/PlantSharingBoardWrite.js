@@ -1,18 +1,18 @@
-// PlantSharingBoardWrite.js
-// 식물 나눔 게시판 - 식물 나눔 게시글 작성 페이지
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../CSS/PlantSharingBoardWrite.css'; 
 import { FiSearch } from 'react-icons/fi';
 import { GrPowerReset } from 'react-icons/gr';
 
-const PlantSharingBoardWrite = () => {
+const PlantSharingBoardWrite = ({ initialShareBoard }) => {
   const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('공지');
-  const [content, setContent] = useState('');
-  const [file, setFile] = useState(null);
-  const [searchAddress, setSearchAddress] = useState('');
+  const [title, setTitle] = useState(initialShareBoard?.title || '');
+  const [category, setCategory] = useState(initialShareBoard?.type || '나눔');
+  const [content, setContent] = useState(initialShareBoard?.content || '');
+  const [files, setFiles] = useState([]);
+  const [searchAddress, setSearchAddress] = useState(initialShareBoard?.address || '');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null); 
@@ -20,14 +20,34 @@ const PlantSharingBoardWrite = () => {
   const currentLocationMarkerRef = useRef(null); 
   const [currentLatLng, setCurrentLatLng] = useState(null);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인 후에 게시글을 작성할 수 있습니다.');
+      navigate('/login');
+    }
+  }, [navigate]);
+
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFiles = Array.from(e.target.files);
+    setFiles([...files, ...selectedFiles]);
+  };
+
+  const handleRemoveFile = (fileToRemove) => {
+    setFiles(files.filter((file) => file !== fileToRemove));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    let adress = null; // 'address' -> 'adress'
+
+    const token = localStorage.getItem('token');
+    const member = localStorage.getItem('username');
+    if (!member) {
+      setError('회원 정보가 없습니다.');
+      return;
+    }
+
+    let address = null;
     if (markerRef.current) {
       const latlng = markerRef.current.getPosition();
       const { kakao } = window;
@@ -36,7 +56,7 @@ const PlantSharingBoardWrite = () => {
         await new Promise((resolve, reject) => {
           geocoder.coord2Address(latlng.getLng(), latlng.getLat(), (result, status) => {
             if (status === kakao.maps.services.Status.OK) {
-              adress = result[0].address.address_name; // 'address' -> 'adress'
+              address = result[0].address.address_name;
               resolve();
             } else {
               reject('주소 검색 실패');
@@ -46,21 +66,45 @@ const PlantSharingBoardWrite = () => {
       }
     }
 
-    const newPost = {
+    const shareboarddata = {
       title,
-      type: category, // 'type' 필드에 해당
+      type: category,
       content,
-      create_date: new Date().toISOString(), // TIMESTAMP에 해당
-      adress, // 'address' -> 'adress'
-      view: 0, // 초기 조회수
-      username: 'user', // 실제 사용자 이름으로 대체해야 함
-      fileName: file ? file.name : null, // 파일 이름만 저장
+      create_date: new Date().toISOString(),
+      address,
+      view: 0,
+      member: { username: member },
     };
 
-    console.log('새 게시물:', newPost);
+    const formData = new FormData();
+    formData.append('shareboarddata', new Blob([JSON.stringify(shareboarddata)], { type: 'application/json' }));
 
-    // 'newPost'를 서버나 API로 전송
-    navigate('/plant-sharing');
+    files.forEach((file) => {
+      formData.append('files', file); // 파일 추가
+    });
+
+    try {
+      setLoading(true);
+
+      const response = await fetch('http://10.125.121.180:8080/api/users/shareboard', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('게시물 작성에 실패했습니다.');
+      }
+
+      navigate('/plant-sharing');
+    } catch (error) {
+      console.error('게시물 작성 실패:', error);
+      setError('게시물을 작성하는 중 문제가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const searchMap = useCallback(() => {
@@ -73,7 +117,6 @@ const PlantSharingBoardWrite = () => {
       geocoder.addressSearch(searchAddress, (result, status) => {
         if (status === kakao.maps.services.Status.OK) {
           const latlng = new kakao.maps.LatLng(result[0].y, result[0].x);
-
           mapRef.current.setCenter(latlng);
           mapRef.current.setLevel(3);
 
@@ -82,13 +125,13 @@ const PlantSharingBoardWrite = () => {
 
           const newMarker = new kakao.maps.Marker({ position: latlng });
           newMarker.setMap(mapRef.current);
-          markerRef.current = newMarker; 
+          markerRef.current = newMarker;
 
           const infowindow = new kakao.maps.InfoWindow({
             content: `<div style="padding:5px;">${result[0].address_name}</div>`,
           });
           infowindow.open(mapRef.current, newMarker);
-          infowindowRef.current = infowindow; 
+          infowindowRef.current = infowindow;
         } else {
           console.error('주소 검색 실패, 상태:', status);
         }
@@ -107,18 +150,20 @@ const PlantSharingBoardWrite = () => {
 
     const newMarker = new kakao.maps.Marker({ position: latlng });
     newMarker.setMap(mapRef.current);
-    markerRef.current = newMarker; 
+    markerRef.current = newMarker;
 
     const geocoder = new kakao.maps.services.Geocoder();
     geocoder.coord2Address(latlng.getLng(), latlng.getLat(), (result, status) => {
       if (status === kakao.maps.services.Status.OK) {
-        const adress = result[0].address.address_name; // 'address' -> 'adress'
-
+        const address = result[0].address.address_name;
         const infowindow = new kakao.maps.InfoWindow({
-          content: `<div style="padding:5px;">주소: ${adress}</div>`, // 'address' -> 'adress'
+          content: `<div style="padding:5px;">주소: ${address}</div>`,
         });
         infowindow.open(mapRef.current, newMarker);
-        infowindowRef.current = infowindow; 
+        infowindowRef.current = infowindow;
+
+        // 주소 입력란에 자동으로 주소 설정
+        setSearchAddress(address);
       } else {
         console.error('주소 검색 실패, 상태:', status);
       }
@@ -127,13 +172,10 @@ const PlantSharingBoardWrite = () => {
 
   useEffect(() => {
     const { kakao } = window;
-    if (!kakao) {
-      console.error('Kakao Maps API가 로드되지 않았습니다.');
-      return;
-    }
+    if (!kakao) return;
 
     const mapOptions = {
-      center: new kakao.maps.LatLng(35.1587, 129.1601), 
+      center: new kakao.maps.LatLng(35.1587, 129.1601),
       level: 8,
     };
 
@@ -146,11 +188,11 @@ const PlantSharingBoardWrite = () => {
         setCurrentLatLng(latlng);
 
         mapRef.current.setCenter(latlng);
-        mapRef.current.setLevel(5); 
+        mapRef.current.setLevel(5);
 
         if (currentLocationMarkerRef.current) currentLocationMarkerRef.current.setMap(null);
 
-        const imageSrc = '/path/to/current-location-marker.png'; 
+        const imageSrc = '/path/to/current-location-marker.png';
         const imageSize = new kakao.maps.Size(32, 32);
         const imageOption = { offset: new kakao.maps.Point(16, 32) };
         const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
@@ -161,14 +203,14 @@ const PlantSharingBoardWrite = () => {
           title: '현재 위치'
         });
         newMarker.setMap(mapRef.current);
-        currentLocationMarkerRef.current = newMarker; 
+        currentLocationMarkerRef.current = newMarker;
 
         const infowindow = new kakao.maps.InfoWindow({
           content: `<div style="padding:5px;">현재 위치</div>`,
         });
         infowindow.open(mapRef.current, newMarker);
 
-        infowindowRef.current = infowindow; 
+        infowindowRef.current = infowindow;
       },
       (error) => {
         console.error('현재 위치를 가져오는 중 오류 발생:', error);
@@ -194,14 +236,15 @@ const PlantSharingBoardWrite = () => {
 
     if (currentLatLng) {
       mapRef.current.setCenter(currentLatLng);
-      mapRef.current.setLevel(3); 
+      mapRef.current.setLevel(3);
     }
   };
 
   return (
     <div className="plant-sharing-board-write-container">
       <form className="plant-sharing-board-write-form" onSubmit={handleSubmit}>
-        <h2 className="form-title">식물 나눔</h2>
+        <h2 className="form-title">{initialShareBoard ? '게시글 수정' : '식물 나눔'}</h2>
+        {error && <p className="error-message">{error}</p>}
         <div className="form-group">
           <label className="form-label">
             카테고리:
@@ -210,9 +253,9 @@ const PlantSharingBoardWrite = () => {
               onChange={(e) => setCategory(e.target.value)}
               className="form-select"
             >
-              <option value="공지">나눔</option>
-              <option value="질문">나눔중</option>
-              <option value="기타">나눔완료</option>
+              <option value="나눔">나눔</option>
+              <option value="나눔중">나눔중</option>
+              <option value="나눔완료">나눔완료</option>
             </select>
           </label>
         </div>
@@ -255,11 +298,28 @@ const PlantSharingBoardWrite = () => {
           첨부 파일:
           <input
             type="file"
+            multiple
             onChange={handleFileChange}
             className="file-input"
           />
         </label>
-        <button type="submit" className="submit-button">작성</button>
+        {files.length > 0 && (
+          <div className="preview-container">
+            {files.map((file, index) => (
+              <div key={index} className="preview-item">
+                <p>{file.name}</p>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFile(file)}
+                  className="remove-file-btn"
+                >
+                  삭제
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <button type="submit" className="submit-button">{initialShareBoard ? '수정하기' : '작성하기'}</button>
       </form>
     </div>
   );

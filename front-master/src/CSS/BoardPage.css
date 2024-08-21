@@ -23,16 +23,16 @@
 .board-search-container {
   display: flex;
   align-items: center; /* 수직 중앙 정렬 */
-  gap: 10px; /* 검색창과 버튼 사이의 간격 */
+  gap: 15px; /* 검색창과 버튼 사이의 간격 */
   margin-top: 20px; /* 검색창과 버튼을 게시판 글과 더 가까이 배치 */
   margin-left: auto; /* 오른쪽으로 밀어 붙이기 */
   font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
 
-
 .board-search-wrapper {
   display: flex;
   align-items: center; /* 수직 중앙 정렬 */
+  gap: 6px; /* 드롭박스와 검색어 입력 칸 사이의 간격 추가 */
   position: relative; /* 아이콘의 절대 위치 지정 */
   font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
@@ -59,7 +59,7 @@
 .board-button-container {
   display: flex;
   align-items: center;
-  gap: 8px; /* 버튼 사이의 간격 조정 */
+  gap: 10px; /* 버튼 사이의 간격 조정 */
   font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
 
@@ -156,7 +156,7 @@
   font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
 
-.board-category-select {
+.board-category-select, .board-private-select { /* 두 클래스에 동일한 스타일 적용 */
   appearance: none; /* 기본 드롭다운 화살표 제거 */
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -176,11 +176,11 @@
   background-position: right 10px center;
 }
 
-.board-category-select:focus {
+.board-category-select:focus, .board-private-select:focus {
   outline: none;
   border-color: #0F3830; /* 포커스 시 테두리 색상 변경 */
 }
 
-.board-category-select:hover {
+.board-category-select:hover, .board-private-select:hover {
   border-color: #0F3830; /* 호버 시 테두리 색상 변경 */
 }

@@ -9,29 +9,35 @@ const BoardPage = () => {
   const location = useLocation();
 
   const [boardData, setBoardData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(''); // 현재 입력된 검색어 상태
-  const [appliedSearchQuery, setAppliedSearchQuery] = useState(''); // 실제로 적용된 검색어 상태
-  const [selectedCategory, setSelectedCategory] = useState(''); // 카테고리 상태
-  const [privateType, setPrivateType] = useState('public'); // 전체보기/나만보기 상태
+  const [searchQuery, setSearchQuery] = useState('');
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [privateType, setPrivateType] = useState('public');
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 카테고리와 privateType을 배열로 미리 정의
-  const categories = ['질문', '수다']; // 카테고리 리스트
-  const privateTypes = ['public', 'private']; // 전체보기/나만보기 리스트
+  // 로그인 상태 확인
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   const fetchBoardData = async (page, size) => {
     setLoading(true);
     try {
       const response = await fetch(`http://10.125.121.180:8080/api/public/freeboard?page=${page}&size=${size}`);
       const data = await response.json();
-      
-      setBoardData(Array.isArray(data) ? data : []);
-      
-      const totalDataCount = data.length;
+
+      // 데이터가 배열이면 setBoardData, 최신순으로 정렬
+      const sortedData = Array.isArray(data) ? data.sort((a, b) => new Date(b.createDate) - new Date(a.createDate)) : [];
+      setBoardData(sortedData);
+
+      const totalDataCount = sortedData.length;
       setTotalPages(Math.ceil(totalDataCount / size));
 
       setError(null);
@@ -47,21 +53,20 @@ const BoardPage = () => {
     fetchBoardData(currentPage, pageSize);
   }, [currentPage, pageSize]);
 
-  // 페이지 이동 시 검색어와 카테고리 초기화
   useEffect(() => {
     if (location.pathname === '/board') {
       setSearchQuery('');
       setAppliedSearchQuery('');
       setSelectedCategory('');
-      setPrivateType('public'); // 페이지 이동 시 기본 privateType 설정
+      setPrivateType('public');
     }
   }, [location.pathname]);
 
   const filteredPosts = useMemo(() => {
     return boardData
-      .filter(post => post.title.toLowerCase().includes(appliedSearchQuery.toLowerCase())) // 실제 적용된 검색어에 따라 필터링
-      .filter(post => (selectedCategory ? post.type === selectedCategory : true)) // 카테고리 필터
-      .filter(post => post.privateType === privateType); // privateType 필터링 추가
+      .filter(post => post.title.toLowerCase().includes(appliedSearchQuery.toLowerCase()))
+      .filter(post => (selectedCategory ? post.type === selectedCategory : true))
+      .filter(post => privateType === 'public' || post.privateType === privateType || (privateType === 'public' && post.privateType === 'private' && post.username === localStorage.getItem('username')));
   }, [boardData, appliedSearchQuery, selectedCategory, privateType]);
 
   const indexOfLastPost = (currentPage + 1) * pageSize;
@@ -71,16 +76,16 @@ const BoardPage = () => {
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 0 && pageNumber < totalPages) {
-      setSearchQuery(''); // 페이지를 변경할 때 검색어 초기화
-      setAppliedSearchQuery(''); // 실제 적용된 검색어도 초기화
-      setSelectedCategory(''); // 카테고리도 초기화
-      setCurrentPage(pageNumber); // 페이지 변경
+      setSearchQuery('');
+      setAppliedSearchQuery('');
+      setSelectedCategory('');
+      setCurrentPage(pageNumber);
     }
   };
 
   const handleSearch = () => {
-    setAppliedSearchQuery(searchQuery); // 검색 버튼을 눌렀을 때 검색어를 적용
-    setCurrentPage(0); // 검색 시 첫 페이지로 돌아감
+    setAppliedSearchQuery(searchQuery);
+    setCurrentPage(0);
   };
 
   const pageRange = 5;
@@ -94,36 +99,31 @@ const BoardPage = () => {
           <h1>자유 게시판</h1>
           <div className="board-search-container">
             <div className="board-search-wrapper">
-              {/* privateType 선택 드롭다운 */}
               <select
                 value={privateType}
                 onChange={(e) => setPrivateType(e.target.value)}
                 className="board-private-select"
+                disabled={!isLoggedIn && privateType === 'private'}
               >
-                {privateTypes.map((type, index) => (
-                  <option key={index} value={type}>
-                    {type === 'public' ? '전체보기' : '나만보기'}
-                  </option>
-                ))}
+                <option value="public">전체보기</option>
+                {isLoggedIn && <option value="private">나만보기</option>}
               </select>
-              
-              {/* 카테고리 선택 드롭다운 */}
+
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="board-category-select"
               >
                 <option value="">전체</option>
-                {categories.map((category, index) => (
-                  <option key={index} value={category}>{category}</option>
-                ))}
+                <option value="질문">질문</option>
+                <option value="수다">수다</option>
               </select>
-              
+
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="검색어를 입력하세요"
+                placeholder="제목을 입력하세요"
                 className="board-search-input"
               />
               <CiSearch className="board-search-icon" onClick={handleSearch} />

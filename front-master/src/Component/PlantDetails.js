@@ -1,226 +1,438 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react'; 
 import { useParams, useNavigate } from 'react-router-dom';
+import ImageComponent from '../Component/ImageComponent';
 import '../CSS/PlantDetail.css';
 
-const PlantDetails = () => {
-  const { shareBoardId } = useParams(); // URL 파라미터에서 게시물 ID를 가져옵니다.
+const PlantDetail = () => {
+  const { shareBoardId } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  const [editCommentId, setEditCommentId] = useState(null);
-  const [editCommentContent, setEditCommentContent] = useState('');
+  const [replyCommentId, setReplyCommentId] = useState(null);
+  const [replyContent, setReplyContent] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editContent, setEditContent] = useState('');
+  const [error, setError] = useState('');
+  const [loggedInUsername, setLoggedInUsername] = useState('');
   const mapRef = useRef(null);
+  const markerRef = useRef(null); // Marker reference for cleanup
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!shareBoardId) {
-        setError('유효하지 않은 게시물 ID입니다.');
-        setLoading(false);
-        return;
-      }
+    const username = localStorage.getItem('username');
+    setLoggedInUsername(username || '');
+  }, []);
 
-      try {
-        const response = await fetch(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`);
-        const data = await response.json();
-        setPost(data);
-      } catch (error) {
-        console.error('게시물 데이터를 가져오는 중 오류 발생:', error);
-        setError('데이터를 가져오는 중 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchComments = async () => {
-      if (!shareBoardId) return;
-
-      try {
-        const response = await fetch(`http://10.125.121.180:8080/api/sharecomment?shareBoardId=${shareBoardId}`);
-        const data = await response.json();
-        setComments(data);
-      } catch (error) {
-        console.error('댓글 데이터를 가져오는 중 오류 발생:', error);
-        setError('댓글 데이터를 가져오는 중 오류가 발생했습니다.');
-      }
-    };
-
-    fetchData();
-    fetchComments();
+  const fetchPost = useCallback(async () => {
+    try {
+      const response = await fetch(`http://10.125.121.180:8080/api/public/shareboard/${shareBoardId}`);
+      const data = await response.json();
+      console.log('데이터', data);
+      setPost(data);
+      setError(null);
+    } catch (error) {
+      setError('게시글을 불러오는 중 오류가 발생했습니다.');
+    }
   }, [shareBoardId]);
 
   useEffect(() => {
+    fetchPost();
+  }, [fetchPost]);
+
+  // Kakao Map 초기화
+  useEffect(() => {
     const { kakao } = window;
-    if (!kakao || !post) return;
-
-    const mapOptions = {
-      center: new kakao.maps.LatLng(35.1587, 129.1601),
-      level: 3,
-    };
-
-    const mapContainer = document.getElementById('map');
-    if (mapContainer) {
-      mapRef.current = new kakao.maps.Map(mapContainer, mapOptions);
-
-      if (post.address) {
+    if (!kakao || !post || !post.address) return;
+  
+    const initializeMap = () => {
+      const mapOptions = {
+        center: new kakao.maps.LatLng(35.1587, 129.1601),
+        level: 3,
+      };
+  
+      const mapContainer = document.getElementById('map');
+      if (mapContainer) {
+        mapRef.current = new kakao.maps.Map(mapContainer, mapOptions);
+        
         const geocoder = new kakao.maps.services.Geocoder();
         geocoder.addressSearch(post.address, (result, status) => {
           if (status === kakao.maps.services.Status.OK) {
             const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
             const marker = new kakao.maps.Marker({
-              position: coords
+              position: coords,
             });
             marker.setMap(mapRef.current);
+            markerRef.current = marker;
             mapRef.current.setCenter(coords);
           } else {
             console.error('주소 검색 실패, 상태:', status);
           }
         });
-      } else {
-        console.warn('주소가 제공되지 않았습니다.');
       }
-    }
-
+    };
+  
+    initializeMap();
+  
     return () => {
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
+      }
       if (mapRef.current) {
         mapRef.current = null;
       }
     };
   }, [post]);
 
-  const handleEdit = () => {
-    navigate(`/plant-sharing/edit/${shareBoardId}`);
+  
+
+  const handlePostDelete = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/shareboard/${shareBoardId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('게시글 삭제 실패');
+      navigate('/board');
+    } catch (error) {
+      console.error('게시글 삭제 중 오류:', error);
+      setError('게시글 삭제 중 오류가 발생했습니다.');
+    }
   };
 
-  const handleDelete = async () => {
-    if (window.confirm('정말로 이 게시물을 삭제하시겠습니까?')) {
-      try {
-        await fetch(`http://10.125.121.180:8080/public/shareboard/${shareBoardId}`, { method: 'DELETE' });
-        alert('게시물이 삭제되었습니다.');
-        navigate('/plant-sharing');
-      } catch (error) {
-        console.error('게시물 삭제 중 오류 발생:', error);
-        setError('게시물을 삭제하는 중 오류가 발생했습니다.');
-      }
-    }
+  const handleEditPostClick = () => {
+    navigate(`/plant-sharing/edit/${post.shareBoardId}`);
   };
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+
+    const newCommentData = {
+      content: newComment,
+      createDate: new Date(),
+      parentId: null,
+      scchildlist: [],
+      deleted: false,
+      shareBoardId: shareBoardId,
+    };
+
     try {
-      const newCommentData = {
-        share_comment_id: comments.length + 1, // 임시 ID
-        share_board_id: parseInt(shareBoardId, 10),
-        content: newComment,
-        username: '작성자명', // 실제 사용자명으로 변경 필요
-        createdate: new Date().toISOString(),
-      };
-      const response = await fetch('http://10.125.121.180:8080/api/sharecomment', {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/shareboard/${shareBoardId}/sharecomment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(newCommentData),
       });
-      const data = await response.json();
-      setComments([...comments, data]);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('서버 에러:', errorData);
+        throw new Error('댓글 등록 실패');
+      }
+
+      await fetchPost();
       setNewComment('');
     } catch (error) {
-      console.error('댓글 작성 중 오류 발생:', error);
-      setError('댓글을 작성하는 중 오류가 발생했습니다.');
+      console.error('댓글 작성 중 오류:', error);
+      setError('댓글 작성 중 오류가 발생했습니다.');
     }
   };
 
-  const handleCommentEdit = async (commentId) => {
+  const handleEditSubmit = async (e, commentId) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+
+    const updatedCommentData = {
+      content: editContent,
+      createDate: new Date(),
+    };
+
     try {
-      const updatedComment = { content: editCommentContent };
-      await fetch(`http://10.125.121.180:8080/api/sharecomment/${commentId}`, {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/shareboard/sharecomment/${commentId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedComment),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedCommentData),
       });
-      setComments(comments.map(comment => 
-        comment.share_comment_id === commentId ? { ...comment, content: editCommentContent } : comment
-      ));
-      setEditCommentId(null);
-      setEditCommentContent('');
+
+      if (!response.ok) throw new Error('댓글 수정 실패');
+      await fetchPost();
+      setEditingCommentId(null);
     } catch (error) {
-      console.error('댓글 수정 중 오류 발생:', error);
-      setError('댓글을 수정하는 중 오류가 발생했습니다.');
+      console.error('댓글 수정 중 오류:', error);
+      setError('댓글 수정 중 오류가 발생했습니다.');
     }
   };
 
-  const handleCommentDelete = async (commentId) => {
-    if (window.confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
-      try {
-        await fetch(`http://10.125.121.180:8080/api/sharecomment/${commentId}`, { method: 'DELETE' });
-        setComments(comments.filter(comment => comment.share_comment_id !== commentId));
-      } catch (error) {
-        console.error('댓글 삭제 중 오류 발생:', error);
-        setError('댓글을 삭제하는 중 오류가 발생했습니다.');
+  const handleEditClick = (commentId, content) => {
+    setEditingCommentId(commentId);
+    setEditContent(content);
+  };
+
+  const handleDelete = async (commentId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+  
+    {/* 댓글 삭제 */}
+    try {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/shareboard/sharecomment/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('댓글 삭제 실패:', errorData);
+        throw new Error('댓글 삭제 실패');
       }
+  
+      // 부모 댓글 삭제 시 자식 댓글의 parentId를 null로 설정하여 독립적인 댓글로 변경
+      setPost((prevPost) => {
+        const promoteChildComments = (comments, idToDelete) => {
+          return comments.map((comment) => {
+            if (comment.shareCommentId === idToDelete) {
+              return {
+                ...comment,
+                deleted: true,
+                scchildlist: comment.scchildlist.map((child) => ({ ...child, parentId: null })),
+              };
+            } else if (comment.scchildlist && comment.scchildlist.length > 0) {
+              return {
+                ...comment,
+                scchildlist: promoteChildComments(comment.scchildlist, idToDelete),
+              };
+            }
+            return comment;
+          });
+        };
+      
+        const updatedComments = promoteChildComments(prevPost.scomts, commentId);
+      
+        return {
+          ...prevPost,
+          scomts: updatedComments,
+        };
+      });
+  
+      setError(null); // 오류 메시지 초기화
+    } catch (error) {
+      console.error('댓글 삭제 중 오류:', error);
+      setError('댓글 삭제 중 오류가 발생했습니다.');
     }
   };
 
-  if (loading) return <div className="loading">로딩 중...</div>;
-  if (error) return <div className="error">오류 발생: {error}</div>;
-  if (!post) return <div>게시물을 찾을 수 없습니다.</div>;
+  const handleReplySubmit = async (e, parentId) => {
+    e.preventDefault();
 
-  return (
-    <div className="plant-detail-container">
-      <h1>{post.title}</h1>
-      <p><strong>카테고리:</strong> {post.type}</p>
-      <p><strong>작성자:</strong> {post.username}</p>
-      <p><strong>작성일:</strong> {new Date(post.createDate).toLocaleDateString()}</p>
-      <p><strong>조회수:</strong> {post.view}</p>
-      <p>{post.content}</p>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
 
-      <div id="map" style={{ width: '100%', height: '300px', marginBottom: '20px' }}></div>
+    const newReply = {
+      content: replyContent,
+      createDate: new Date(),
+      parentId: parentId,
+      scchildlist: [],
+      deleted: false,
+      shareBoardId: shareBoardId,
+    };
 
-      <div className="buttons-container">
-        <button onClick={handleEdit} className="edit-button">수정</button>
-        <button onClick={handleDelete} className="delete-button">삭제</button>
-        <button onClick={() => navigate('/plant-sharing')} className="back-button">목록으로 돌아가기</button>
-      </div>
+    try {
+      const response = await fetch(`http://10.125.121.180:8080/api/users/shareboard/${shareBoardId}/sharecomment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(newReply),
+      });
 
-      <div className="comments-section">
-        <h2>댓글</h2>
-        <form onSubmit={handleCommentSubmit}>
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="댓글을 입력하세요"
-            required
-          />
-          <button type="submit">댓글 작성</button>
-        </form>
-        {comments.length > 0 ? (
-          comments.map(comment => (
-            <div key={comment.share_comment_id} className="comment">
-              {editCommentId === comment.share_comment_id ? (
-                <div>
-                  <textarea
-                    value={editCommentContent}
-                    onChange={(e) => setEditCommentContent(e.target.value)}
-                  />
-                  <button onClick={() => handleCommentEdit(comment.share_comment_id)}>저장</button>
-                </div>
-              ) : (
-                <div>
-                  <p>{comment.content}</p>
-                  <p><strong>{comment.username}</strong> - {new Date(comment.createdate).toLocaleDateString()}</p>
-                  <button onClick={() => setEditCommentId(comment.share_comment_id) || setEditCommentContent(comment.content)}>수정</button>
-                  <button onClick={() => handleCommentDelete(comment.share_comment_id)}>삭제</button>
-                </div>
-              )}
-            </div>
-          ))
+      if (!response.ok) throw new Error('대댓글 등록 실패');
+      await fetchPost();
+      setReplyContent('');
+      setReplyCommentId(null);
+    } catch (error) {
+      console.error('대댓글 작성 중 오류:', error);
+      setError('대댓글 등록 중 오류가 발생했습니다.');
+    }
+  };
+
+
+  const renderComments = (comments) => {
+    return comments.map(comment => (
+      <div key={comment.shareCommentId} className="comment" style={{ marginLeft: comment.parentId ? '20px' : '0px' }}>
+        {comment.deleted ? (
+          <p className="deleted-comment">삭제된 댓글입니다.</p>
         ) : (
-          <p>댓글이 없습니다.</p>
+          <>
+            {editingCommentId === comment.shareCommentId ? (
+              <form onSubmit={(e) => handleEditSubmit(e, comment.shareCommentId)}>
+                <textarea
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  required
+                />
+                <button type="submit">저장</button>
+                <button type="button" onClick={() => setEditingCommentId(null)}>취소</button>
+              </form>
+            ) : (
+              <>
+                <p>{comment.content}</p>
+                <span>{comment.username || '알 수 없음'}</span>
+                <span>{new Date(comment.createDate).toLocaleDateString()}</span>
+
+                {/* 댓글 작성자와 로그인된 사용자가 같을 때만 수정, 삭제 버튼 표시 */}
+                {loggedInUsername === comment.username && (
+                  <>
+                    <button onClick={() => handleEditClick(comment.shareCommentId, comment.content)}>수정</button>
+                    <button onClick={() => handleDelete(comment.shareCommentId)}>삭제</button>
+                  </>
+                )}
+                <button onClick={() => setReplyCommentId(comment.shareCommentId)}>대댓글 작성</button>
+              </>
+            )}
+
+            {replyCommentId === comment.shareCommentId && (
+              <form onSubmit={(e) => handleReplySubmit(e, comment.shareCommentId)}>
+                <textarea
+                  value={replyContent}
+                  onChange={(e) => setReplyContent(e.target.value)}
+                  placeholder="대댓글을 입력하세요"
+                  required
+                />
+                <button type="submit">대댓글 작성</button>
+              </form>
+            )}
+
+            {comment.scchildlist && comment.scchildlist.length > 0 && (
+              <div className="child-comments" style={{ marginLeft: '20px' }}>
+                {renderComments(comment.scchildlist)}
+              </div>
+            )}
+          </>
         )}
       </div>
+    ));
+  };
+
+  return (
+    <div className="post-detail-container">
+      {error && <p className="error-message">{error}</p>}
+      {post ? (
+        <div>
+          <table className="post-detail-table">
+            <thead>
+              <tr>
+                <th>번호</th>
+                <th>카테고리</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>작성일</th>
+                <th>조회수</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{post.shareBoardId || '정보 없음'}</td>
+                <td>{post.type || '정보 없음'}</td>
+                <td>{post.title || '정보 없음'}</td>
+                <td>{post.username || '알 수 없음'}</td>
+                <td>{new Date(post.createDate).toLocaleDateString()}</td>
+                <td>{post.view || '정보 없음'}</td>
+              </tr>
+            </tbody>
+          </table>
+          <h1 className="post-title">{post.title || '정보 없음'}</h1>
+          <p className="post-content">{post.content || '정보 없음'}</p>
+
+          {post.simges && post.simges.length > 0 ? (
+            <div className="post-images">
+              {post.simges.map((image, index) => (
+                <ImageComponent key={index} filename={`null${image}`} />
+              ))}
+            </div>
+          ) : (
+            <p>첨부 파일이 없습니다.</p>
+          )}
+
+          {/* Render the map and address only if an address is provided */}
+        {post.address && post.address.trim() && (
+          <>
+            <div id="map" style={{ width: '100%', height: '400px' }}></div>
+            <div className="post-address">
+              <p><strong>주소:</strong> {post.address}</p>
+            </div>
+          </>
+        )}
+
+          <div className="post-actions">
+            <button className="back-button" onClick={() => navigate('/board')}>돌아가기</button>
+            
+            {loggedInUsername === post.username && (
+              <>
+                <button className="edit-button" onClick={handleEditPostClick}>수정하기</button>
+                <button className="delete-button" onClick={handlePostDelete}>삭제하기</button>
+              </>
+            )}
+          </div>
+
+          <div className="comments-section">
+            <h2>댓글</h2>
+            <form onSubmit={handleCommentSubmit}>
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="댓글을 입력하세요"
+                required
+              />
+              <button type="submit">댓글 작성</button>
+            </form>
+            {post.scomts && post.scomts.length > 0 ? (
+              renderComments(post.scomts)
+            ) : (
+              <p>댓글이 없습니다.</p>
+            )}
+          </div>
+        </div>
+      ) : (
+        <p>게시글을 로드하는 중입니다...</p>
+      )}
     </div>
   );
 };
 
-export default PlantDetails;
+export default PlantDetail;

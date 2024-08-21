@@ -4,9 +4,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100vh; /* Viewport Height 전체를 커버하도록 설정 */
+  width: 100vw; /* Viewport Width 전체를 커버하도록 설정 */
   background-color: #f0f0f0;
-  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 /* 폼 컨테이너 스타일 */
@@ -68,28 +69,29 @@
   background-color: #0F2C22;
   color: #ffffff;
   border: none;
-  padding: 12px 0; /* 버튼의 높이 */
+  padding: 12px 0;
   cursor: pointer;
-  font-size: 16px; /* 폰트 크기 */
-  width: 100%; /* 버튼이 컨테이너 너비에 맞게 설정 */
-  margin-top: 10px; /* 버튼들 사이의 여백 */
-  box-sizing: border-box; /* 패딩과 테두리를 포함하여 버튼의 총 너비와 높이를 계산 */
-  line-height: 1.5; /* 텍스트의 줄 높이 */
-  transition: background-color 0.3s ease; /* 배경색 변경 애니메이션 */
+  font-size: 16px;
+  width: 100%;
+  margin-top: 10px;
+  box-sizing: border-box;
+  line-height: 1.5;
+  transition: background-color 0.3s ease;
   font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
 
 /* 버튼 호버 스타일 */
 .Signbutton:hover {
-  background-color: #00332a; /* 호버 시 배경색 변경 */
+  background-color: #185a43;
   font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
 
 /* 로그인 링크 스타일 */
 .Signlogin-button {
-  width: 100%; /* 버튼이 컨테이너 너비에 맞게 설정 */
-  margin-top: 5px; /* 버튼들 사이의 여백 */
-  display: inline-block; /* 버튼처럼 보이게 하기 위해 인라인 블록으로 설정 */
+  width: 100%;
+  margin-top: 5px;
+  display: inline-block;
+  text-align: center;
   font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
 

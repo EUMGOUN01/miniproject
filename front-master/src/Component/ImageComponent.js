@@ -16,7 +16,11 @@ const ImageComponent = ({ filename }) => {
     return (
         <div>
             {imageUrl ? (
-                <img src={imageUrl} alt={filename} />
+                <img
+                    src={imageUrl}
+                    alt={filename}
+                    onError={() => console.error('이미지 로드 오류:', imageUrl)}
+                />
             ) : (
                 <p>이미지를 로드하는 중입니다...</p>
             )}

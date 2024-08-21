@@ -5,9 +5,9 @@ import '../CSS/WritePostPage.css'; // CSS 파일
 const EditPostPage = () => {
   const { freeBoardId } = useParams(); // URL 파라미터에서 freeBoardId 추출
   const navigate = useNavigate(); // 페이지 이동을 위한 navigate 훅
-  
+
   const [title, setTitle] = useState(''); // 게시글 제목 상태
-  const [category, setCategory] = useState('기타'); // 게시글 카테고리 상태
+  const [category, setCategory] = useState('질문'); // 게시글 카테고리 상태
   const [content, setContent] = useState(''); // 게시글 내용 상태
   const [files, setFiles] = useState([]); // 첨부 파일 상태
   const [removedFiles, setRemovedFiles] = useState([]); // 삭제된 파일 상태
@@ -23,12 +23,12 @@ const EditPostPage = () => {
         setTitle(data.title);
         setCategory(data.type);
         setContent(data.content);
-        setPrivateType(data.privateType || 'public'); // 게시글의 보기 설정 값 가져오기
+        setPrivateType(data.privateType || 'public');
         setFiles(data.fimges ? data.fimges.map(file => ({
           fimgid: file.fimgid,
-          name: file.fimgoriname, // 원본 파일 이름
-          url: `http://10.125.121.180:8080/photos/${file.fimgid}`, // 파일 ID를 사용한 이미지 URL
-          existing: true, // 기존 파일임을 나타냄
+          name: file.fimgoriname,
+          url: `http://10.125.121.180:8080/photos/${file.fimgid}`,
+          existing: true,
         })) : []);
       } catch (error) {
         console.error('Error fetching post:', error);
@@ -74,6 +74,7 @@ const EditPostPage = () => {
       return;
     }
 
+    // 식물 나눔 게시판 데이터
     const formData = new FormData();
     formData.append('freeboarddata', new Blob([JSON.stringify({
       freeBoardId,
@@ -81,19 +82,17 @@ const EditPostPage = () => {
       type: category,
       title,
       content,
-      removedFiles, // 삭제된 파일 ID 리스트 전달
+      removedFiles,
     })], { type: 'application/json' }));
 
     // 새로 추가된 파일만 업로드
     files.forEach(file => {
       if (!file.existing && file.file) {
-        formData.append('files', file.file); // file 객체 자체를 추가합니다.
+        formData.append('files', file.file); // 새로운 파일만 추가
       }
     });
 
-    // JWT 토큰 가져오기
     const token = localStorage.getItem('token');
-
     if (!token) {
       alert('로그인이 필요합니다.');
       navigate('/login');
@@ -101,8 +100,9 @@ const EditPostPage = () => {
     }
 
     try {
-      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/${freeBoardId}`, {
-        method: 'PUT',
+      // 서버에 게시글 수정 요청 보내기
+      const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard`, {
+        method: 'PUT', // PUT 요청
         headers: {
           'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
         },
@@ -122,6 +122,7 @@ const EditPostPage = () => {
     }
   };
 
+  // 게시판 구조
   return (
     <div className="write-container">
       <form className="write-form" onSubmit={handleSubmit}>
@@ -135,9 +136,8 @@ const EditPostPage = () => {
               onChange={(e) => setCategory(e.target.value)}
               className="write-select"
             >
-              <option value="공지">공지</option>
               <option value="질문">질문</option>
-              <option value="기타">기타</option>
+              <option value="수다">수다</option>
             </select>
           </label>
         </div>

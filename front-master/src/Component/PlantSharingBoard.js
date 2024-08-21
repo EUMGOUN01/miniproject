@@ -11,20 +11,32 @@ const PlantSharingBoard = () => {
   const [boardData, setBoardData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [appliedSearchQuery, setAppliedSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [privateType, setPrivateType] = useState('public');
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(15);
-  const [totalPages, setTotalPages] = useState(1); // Default to 1 since there are 10 items and pageSize is 15
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // 로그인 상태 확인
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   const fetchBoardData = async (page, size) => {
     setLoading(true);
     try {
       const response = await fetch(`http://10.125.121.180:8080/api/public/shareboard?page=${page}&size=${size}`);
       const data = await response.json();
-      setBoardData(Array.isArray(data) ? data : []);
-     
-      const totalDataCount = data.length; 
+
+      const sortedData = Array.isArray(data) ? data.sort((a, b) => new Date(b.createDate) - new Date(a.createDate)) : [];
+      setBoardData(sortedData);
+
+      const totalDataCount = sortedData.length;
       setTotalPages(Math.ceil(totalDataCount / size));
 
       setError(null);
@@ -44,27 +56,29 @@ const PlantSharingBoard = () => {
     if (location.pathname === '/plant-sharing') {
       setSearchQuery('');
       setAppliedSearchQuery('');
+      setSelectedCategory('');
+      setPrivateType('public');
     }
   }, [location.pathname]);
 
   const filteredPosts = useMemo(() => {
-    return boardData.filter(post =>
-      post.title.toLowerCase().includes(appliedSearchQuery.toLowerCase())
-    );
-  }, [boardData, appliedSearchQuery]);
+    return boardData
+      .filter(post => post.title.toLowerCase().includes(appliedSearchQuery.toLowerCase()))
+      .filter(post => (selectedCategory ? post.status === selectedCategory : true))
+      .filter(post => privateType === 'public' || post.privateType === privateType || (privateType === 'public' && post.privateType === 'private' && post.username === localStorage.getItem('username')))
+      .sort((a, b) => new Date(b.createDate) - new Date(a.createDate)); // 최신순 정렬
+  }, [boardData, appliedSearchQuery, selectedCategory, privateType]);
 
   const indexOfLastPost = (currentPage + 1) * pageSize;
   const indexOfFirstPost = indexOfLastPost - pageSize;
 
-  const currentPosts = useMemo(() =>
-    filteredPosts.slice(indexOfFirstPost, indexOfLastPost),
-    [filteredPosts, indexOfFirstPost, indexOfLastPost]
-  );
+  const currentPosts = useMemo(() => filteredPosts.slice(indexOfFirstPost, indexOfLastPost), [filteredPosts, indexOfFirstPost, indexOfLastPost]);
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 0 && pageNumber < totalPages) {
       setSearchQuery('');
       setAppliedSearchQuery('');
+      setSelectedCategory('');
       setCurrentPage(pageNumber);
     }
   };
@@ -75,11 +89,8 @@ const PlantSharingBoard = () => {
   };
 
   const pageRange = 5;
-  const startPage = Math.max(0, Math.min(currentPage - Math.floor(pageRange / 2), totalPages - pageRange));
+  const startPage = Math.max(0, currentPage - Math.floor(pageRange / 2));
   const endPage = Math.min(totalPages - 1, startPage + pageRange - 1);
-
-  // Ensure valid length for pages array
-  const pages = Array.from({ length: Math.max(0, endPage - startPage + 1) }, (_, i) => startPage + i);
 
   return (
     <>
@@ -88,6 +99,27 @@ const PlantSharingBoard = () => {
           <h1>식물 나눔 게시판</h1>
           <div className="plant-sharing-board-search-container">
             <div className="plant-sharing-board-search-wrapper">
+              <select
+                value={privateType}
+                onChange={(e) => setPrivateType(e.target.value)}
+                className="board-private-select"
+                disabled={!isLoggedIn && privateType === 'private'}
+              >
+                <option value="public">전체보기</option>
+                {isLoggedIn && <option value="private">나만보기</option>}
+              </select>
+
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="board-category-select"
+              >
+                <option value="">전체</option>
+                <option value="나눔">나눔</option>
+                <option value="나눔중">나눔중</option>
+                <option value="나눔완료">나눔완료</option>
+              </select>
+
               <input
                 type="text"
                 value={searchQuery}
@@ -110,6 +142,7 @@ const PlantSharingBoard = () => {
           <thead>
             <tr>
               <th>번호</th>
+              <th>카테고리</th>
               <th>제목</th>
               <th>작성자</th>
               <th>작성일</th>
@@ -121,6 +154,7 @@ const PlantSharingBoard = () => {
               currentPosts.map((post, index) => (
                 <tr key={post.shareBoardId} onClick={() => navigate(`/plant-sharing/${post.shareBoardId}`)} className="board-row">
                   <td>{indexOfFirstPost + index + 1}</td>
+                  <td>{post.type}</td>
                   <td>{post.title}</td>
                   <td>{post.username || '알 수 없음'}</td>
                   <td>{new Date(post.createDate).toLocaleDateString()}</td>
@@ -144,9 +178,9 @@ const PlantSharingBoard = () => {
                 {startPage > 1 && <span className="board-page-dots">...</span>}
               </>
             )}
-            {pages.map(page => (
-              <span key={page} onClick={() => handlePageChange(page)} className={`board-page-number ${currentPage === page ? 'active' : ''}`}>
-                {page + 1}
+            {[...Array(endPage - startPage + 1).keys()].map(i => (
+              <span key={startPage + i} onClick={() => handlePageChange(startPage + i)} className={`board-page-number ${currentPage === startPage + i ? 'active' : ''}`}>
+                {startPage + i + 1}
               </span>
             ))}
             {endPage < totalPages - 1 && (
