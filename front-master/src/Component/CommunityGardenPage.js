@@ -1,11 +1,9 @@
-//CommunityGardenPage.js
-// 공용텃밭 보여주는 페이지
-import React from 'react';
-import { Map, MapMarker, MapInfoWindow } from 'react-kakao-maps-sdk';
+import React, { useState } from 'react';
+import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { HiArrowCircleRight } from 'react-icons/hi';
 import '../CSS/CommunityGardenPage.css';
 
-// 테스트용 지도
+// 테스트용 지도 데이터
 const gardenData = [
   {
     id: 1,
@@ -22,7 +20,18 @@ const gardenData = [
 ];
 
 const CommunityGardenPage = () => {
-  const [activeMarker, setActiveMarker] = React.useState(null);
+  const [selectedGarden, setSelectedGarden] = useState(null); // State to track selected garden's address
+  const [mapCenter, setMapCenter] = useState({ lat: 35.084138, lng: 128.873972 }); // State to manage map center
+
+  const handleButtonClick = (garden) => {
+    setSelectedGarden(garden);
+    setMapCenter(garden.location); // Set map center to selected garden's location
+  };
+
+  const handleMarkerClick = (garden) => {
+    setSelectedGarden(garden); // Show the address of the selected garden
+    setMapCenter(garden.location); // Move map to the selected garden's location
+  };
 
   return (
     <div className="Community-container">
@@ -44,36 +53,43 @@ const CommunityGardenPage = () => {
             자세한 정보 보기
           </a>
         </div>
+        {/* Buttons for selecting gardens */}
+        <div className="Community-garden-buttons">
+          {gardenData.map(garden => (
+            <button
+              key={garden.id}
+              onClick={() => handleButtonClick(garden)}
+              className="Community-garden-button"
+            >
+              {garden.name}
+            </button>
+          ))}
+        </div>
       </div>
+
       <div className="Community-map-section">
         <Map
-          center={{ lat: 35.084138, lng: 128.873972 }}
-          style={{ width: '100%', height: '500px' }}
-          level={8}
+          center={mapCenter}
+          style={{ width: '100%', height: '400px' }}
+          level={5}
         >
-          {gardenData.map((garden) => (
+          {gardenData.map(garden => (
             <MapMarker
               key={garden.id}
               position={garden.location}
-              onClick={() => setActiveMarker(garden.id)}
+              onClick={() => handleMarkerClick(garden)} // Marker click event
             />
           ))}
-
-          {gardenData.map((garden) =>
-            activeMarker === garden.id ? (
-              <MapInfoWindow
-                key={garden.id}
-                position={garden.location}
-                onCloseClick={() => setActiveMarker(null)}
-              >
-                <div>
-                  <h4>{garden.name}</h4>
-                  <p>{garden.details}</p>
-                </div>
-              </MapInfoWindow>
-            ) : null
-          )}
         </Map>
+      </div>
+
+      {/* 클릭된 주소 나오는 부분 - 맵 아래로 이동 */}
+      <div className="Community-address-section">
+        {selectedGarden ? (
+          <p><strong>주소:</strong> {selectedGarden.details}</p>
+        ) : (
+          <p>텃밭을 선택하면 주소가 여기에 표시됩니다.</p>
+        )}
       </div>
     </div>
   );

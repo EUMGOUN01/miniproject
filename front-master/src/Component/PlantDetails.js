@@ -291,43 +291,47 @@ const PlantDetail = () => {
     }
   };
 
-
   const renderComments = (comments) => {
-    return comments.map(comment => (
+    return comments.map((comment) => (
       <div key={comment.shareCommentId} className="comment" style={{ marginLeft: comment.parentId ? '20px' : '0px' }}>
         {comment.deleted ? (
           <p className="deleted-comment">삭제된 댓글입니다.</p>
         ) : (
           <>
+            <div className="comment-header">
+              <span className="comment-username">{comment.username || '알 수 없음'}</span>
+              <span className="comment-date">{new Date(comment.createDate).toLocaleDateString()}</span>
+            </div>
+  
             {editingCommentId === comment.shareCommentId ? (
-              <form onSubmit={(e) => handleEditSubmit(e, comment.shareCommentId)}>
+              <form onSubmit={(e) => handleEditSubmit(e, comment.shareCommentId)} className="edit-comment-section">
                 <textarea
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                   required
                 />
-                <button type="submit">저장</button>
-                <button type="button" onClick={() => setEditingCommentId(null)}>취소</button>
+                <div className="comment-edit-buttons">
+                  <button type="submit">저장</button>
+                  <button type="button" onClick={() => setEditingCommentId(null)}>취소</button>
+                </div>
               </form>
             ) : (
               <>
-                <p>{comment.content}</p>
-                <span>{comment.username || '알 수 없음'}</span>
-                <span>{new Date(comment.createDate).toLocaleDateString()}</span>
-
-                {/* 댓글 작성자와 로그인된 사용자가 같을 때만 수정, 삭제 버튼 표시 */}
-                {loggedInUsername === comment.username && (
-                  <>
-                    <button onClick={() => handleEditClick(comment.shareCommentId, comment.content)}>수정</button>
-                    <button onClick={() => handleDelete(comment.shareCommentId)}>삭제</button>
-                  </>
-                )}
-                <button onClick={() => setReplyCommentId(comment.shareCommentId)}>대댓글 작성</button>
+                <p className="comment-content">{comment.content}</p>
+                <div className="comment-buttons">
+                  {loggedInUsername === comment.username && (
+                    <>
+                      <button onClick={() => handleEditClick(comment.shareCommentId, comment.content)}>수정</button>
+                      <button onClick={() => handleDelete(comment.shareCommentId)}>삭제</button>
+                    </>
+                  )}
+                  <button onClick={() => setReplyCommentId(comment.shareCommentId)}>대댓글 작성</button>
+                </div>
               </>
             )}
-
+  
             {replyCommentId === comment.shareCommentId && (
-              <form onSubmit={(e) => handleReplySubmit(e, comment.shareCommentId)}>
+              <form onSubmit={(e) => handleReplySubmit(e, comment.shareCommentId)} className="comment-form">
                 <textarea
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
@@ -337,9 +341,9 @@ const PlantDetail = () => {
                 <button type="submit">대댓글 작성</button>
               </form>
             )}
-
+  
             {comment.scchildlist && comment.scchildlist.length > 0 && (
-              <div className="child-comments" style={{ marginLeft: '20px' }}>
+              <div className="child-comments">
                 {renderComments(comment.scchildlist)}
               </div>
             )}
@@ -348,7 +352,7 @@ const PlantDetail = () => {
       </div>
     ));
   };
-
+  
   return (
     <div className="post-detail-container">
       {error && <p className="error-message">{error}</p>}
@@ -378,7 +382,7 @@ const PlantDetail = () => {
           </table>
           <h1 className="post-title">{post.title || '정보 없음'}</h1>
           <p className="post-content">{post.content || '정보 없음'}</p>
-
+  
           {post.simges && post.simges.length > 0 ? (
             <div className="post-images">
               {post.simges.map((image, index) => (
@@ -388,35 +392,34 @@ const PlantDetail = () => {
           ) : (
             <p>첨부 파일이 없습니다.</p>
           )}
-
-          {/* Render the map and address only if an address is provided */}
-        {post.address && post.address.trim() && (
-          <>
-            <div id="map" style={{ width: '100%', height: '400px' }}></div>
-            <div className="post-address">
-              <p><strong>주소:</strong> {post.address}</p>
-            </div>
-          </>
-        )}
-
+  
+          {post.address && post.address.trim() && (
+            <>
+              <div id="map" style={{ width: '100%', height: '400px' }}></div>
+              <div className="post-address">
+                <p><strong>주소:</strong> {post.address}</p>
+              </div>
+            </>
+          )}
+  
           <div className="post-actions">
-            <button className="back-button" onClick={() => navigate('/plant-sharing')}>돌아가기</button>
+            <button className="action-button" onClick={() => navigate('/plant-sharing')}>돌아가기</button>
             
             {loggedInUsername === post.username && (
               <>
-                <button className="edit-button" onClick={handleEditPostClick}>수정하기</button>
-                <button className="delete-button" onClick={handlePostDelete}>삭제하기</button>
+                <button className="action-button" onClick={handleEditPostClick}>수정하기</button>
+                <button className="action-button" onClick={handlePostDelete}>삭제하기</button>
               </>
             )}
           </div>
-
+  
           <div className="comments-section">
             <h2>댓글</h2>
-            <form onSubmit={handleCommentSubmit}>
+            <form onSubmit={handleCommentSubmit} className="comment-form">
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="댓글을 입력하세요"
+                placeholder="로그인 시 이용가능합니다.."
                 required
               />
               <button type="submit">댓글 작성</button>

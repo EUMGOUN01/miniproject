@@ -36,13 +36,14 @@ const InfoPage = () => {
         <div className="search-container">
           <input
             type="text"
-            placeholder="검색..."
+            placeholder="이름을 입력하세요..."
             value={searchTerm}
             onChange={handleSearchChange}
           />
           <button>검색</button>
         </div>
       </div>
+      {/*이미지 처리하는*/}
       <div className="garden-list">
         {filteredGardenData && filteredGardenData.map((garden) => (
           <div className="garden-card" key={garden.cntntsNo}>
@@ -63,34 +64,30 @@ const InfoPage = () => {
             <span className="garden-close" onClick={handleCloseModal}>&times;</span>
             {plantLoading ? <p>로딩 중...</p> : plantError ? <p>에러 발생: {plantError}</p> : (
               plantData && plantData.response && plantData.response.body && plantData.response.body.item && (
-                <div>
-                   <p><strong>이름:</strong> {plantData.response.body.item.distbNm}</p>
-                  <p><strong>콘텐츠 번호:</strong> {plantData.response.body.item.cntntsNo}</p>
-                  <p><strong>라틴어 이름:</strong> {plantData.response.body.item.plntbneNm}</p>
-                  <p><strong>영어 이름:</strong> {plantData.response.body.item.plntzrNm}</p>
-                  <p><strong>과 이름:</strong> {plantData.response.body.item.fmlNm}</p>
-                  <p><strong>원산지:</strong> {plantData.response.body.item.orgplceInfo}</p>
-                  <p><strong>관리:</strong> {plantData.response.body.item.adviseInfo}</p>
-                  <p><strong>성장 높이:</strong> {plantData.response.body.item.growthHgInfo}</p>
-                  <p><strong>성장 폭:</strong> {plantData.response.body.item.growthAraInfo}</p>
-                  <p><strong>잎 모양:</strong> {plantData.response.body.item.lefStleInfo}</p>
-                  <p><strong>냄새 코드:</strong> {plantData.response.body.item.smellCodeNm}</p>
-                  <p><strong>독성 정보:</strong> {plantData.response.body.item.toxctyInfo}</p>
-                  <p><strong>번식 시대 정보:</strong> {plantData.response.body.item.prpgtEraInfo}</p>
-                  <p><strong>기타 시대 정보:</strong> {plantData.response.body.item.etcEraInfo}</p>
-                  <p><strong>관리 수준:</strong> {plantData.response.body.item.managelevelCodeNm}</p>
-                  <p><strong>성장 속도:</strong> {plantData.response.body.item.grwtveCodeNm}</p>
-                  <p><strong>성장 온도:</strong> {plantData.response.body.item.grwhTpCodeNm}</p>
-                  <p><strong>겨울 최저 온도:</strong> {plantData.response.body.item.winterLwetTpCodeNm}</p>
-                  <p><strong>습도 코드 이름:</strong> {plantData.response.body.item.hdCodeNm}</p>
-                  <p><strong>비료:</strong> {plantData.response.body.item.frtlzInfo}</p>
-                  <p><strong>토양:</strong> {plantData.response.body.item.soilInfo}</p>
-                  <p><strong>물 주기 봄:</strong> {plantData.response.body.item.watercycleSprngCodeNm}</p>
-                  <p><strong>물 주기 여름:</strong> {plantData.response.body.item.watercycleSummerCodeNm}</p>
-                  <p><strong>물 주기 가을:</strong> {plantData.response.body.item.watercycleAutumnCodeNm}</p>
-                  <p><strong>물 주기 겨울:</strong> {plantData.response.body.item.watercycleWinterCodeNm}</p>
-                  <p><strong>해충 관리:</strong> {plantData.response.body.item.dlthtsManageInfo}</p>
-                  <p><strong>특별 관리:</strong> {plantData.response.body.item.speclmanageInfo}</p>
+                <div style={{ textAlign: 'left' }}>
+                  <p><strong>영어 이름:</strong> Checkerberry, Eastern Teaberry, (Spreading) Wintergreen</p>
+                  <p><strong>과 이름:</strong> 63051</p>
+                  <p><strong>원산지:</strong> 아시아, 아메리카, 캐나다</p>
+                  <p><strong>관리:</strong> 식용, 지피, 약용, 향기, 관엽, 관화, 관실</p>
+                  <p><strong>성장 높이:</strong> 15cm</p>
+                  <p><strong>성장 폭:</strong> 25cm</p>
+                  <p><strong>잎 모양:</strong> 화려함, 잎의 질감-중간, 잎의 광택-있음, 상록</p>
+                  <p><strong>냄새 코드:</strong> 중간</p>
+                  <p><strong>독성 정보:</strong> 없음</p>
+                  <p><strong>번식 시대 정보:</strong> 파종-9~11월/분주-3~5월</p>
+                  <p><strong>기타 시대 정보:</strong> 없음</p>
+                  <p><strong>관리 수준:</strong> 경험자</p>
+                  <p><strong>성장 속도:</strong> 느림</p>
+                  <p><strong>성장 온도:</strong> 16~20℃</p>
+                  <p><strong>겨울 최저 온도:</strong> 0℃ 이하</p>
+                  <p><strong>습도 코드 이름:</strong> 40~70%</p>
+                  <p><strong>토양:</strong> 중성, 산성 / 배수 잘 됨 (Loam, Sand)</p>
+                  <p><strong>물 주기 봄:</strong> 토양 표면이 말랐을 때 충분히 관수함</p>
+                  <p><strong>물 주기 여름:</strong> 토양 표면이 말랐을 때 충분히 관수함</p>
+                  <p><strong>물 주기 가을:</strong> 토양 표면이 말랐을 때 충분히 관수함</p>
+                  <p><strong>물 주기 겨울:</strong> 화분 흙 대부분 말랐을 때 충분히 관수함</p>
+                  <p><strong>해충 관리:</strong> 없음</p>
+                  <p><strong>특별 관리:</strong> 없음</p>
                 </div>
               )
             )}

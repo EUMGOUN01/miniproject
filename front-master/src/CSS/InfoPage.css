@@ -157,7 +157,7 @@ body {
 .garden-modal-content {
   background: white;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 5px;
   position: relative;
   width: var(--modal-width);
   max-width: var(--modal-max-width);
@@ -177,17 +177,40 @@ body {
   transition: color 0.3s ease;
 }
 
+
+
 .garden-close:hover {
   color: darken(var(--primary-color), 10%);
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
   .garden-list {
     grid-template-columns: 1fr; /* Single column layout on smaller screens */
   }
 
   .garden-modal-content {
-    width: 95%; /* Wider modal on smaller screens */
+    width: 100%; /* Wider modal on smaller screens */
   }
+}
+
+.garden-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.garden-card {
+  text-align: center; /* 카드 내 모든 내용 중앙 정렬 */
+  margin: 10px;
+  width: 200px;
+}
+
+.garden-card img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%; /* 원하는 너비로 조정 가능 */
+  max-width: 150px; /* 이미지를 더 작게 하고 싶다면 이 값을 수정 */
+  height: auto;
 }

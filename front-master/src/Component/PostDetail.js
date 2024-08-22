@@ -154,7 +154,6 @@ const PostDetail = () => {
       return;
     }
   
-    {/* 댓글 삭제 */}
     try {
       const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard/freecomment/${commentId}`, {
         method: 'DELETE',
@@ -169,12 +168,10 @@ const PostDetail = () => {
         throw new Error('댓글 삭제 실패');
       }
   
-      // 부모 댓글 삭제 시 자식 댓글의 parentId를 null로 설정하여 독립적인 댓글로 변경
       setPost((prevPost) => {
         const promoteChildComments = (comments, idToDelete) => {
           return comments.map((comment) => {
             if (comment.freeCommentId === idToDelete) {
-              // 부모 댓글 삭제, 자식 댓글의 parentId를 null로 설정
               return {
                 ...comment,
                 deleted: true,
@@ -198,7 +195,7 @@ const PostDetail = () => {
         };
       });
   
-      setError(null); // 오류 메시지 초기화
+      setError(null);
     } catch (error) {
       console.error('댓글 삭제 중 오류:', error);
       setError('댓글 삭제 중 오류가 발생했습니다.');
@@ -247,58 +244,23 @@ const PostDetail = () => {
 
   const renderComments = (comments) => {
     return comments.map(comment => (
-      <div key={comment.freeCommentId} className="comment" style={{ marginLeft: comment.parentId ? '20px' : '0px' }}>
-        {comment.deleted ? (
-          <p className="deleted-comment">삭제된 댓글입니다.</p>
-        ) : (
-          <>
-            {editingCommentId === comment.freeCommentId ? (
-              <form onSubmit={(e) => handleEditSubmit(e, comment.freeCommentId)}>
-                <textarea
-                  value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
-                  required
-                />
-                <button type="submit">저장</button>
-                <button type="button" onClick={() => setEditingCommentId(null)}>취소</button>
-              </form>
-            ) : (
-              <>
-                <p>{comment.content}</p>
-                <span>{comment.username || '알 수 없음'}</span>
-                <span>{new Date(comment.createDate).toLocaleDateString()}</span>
-
-                {/* 댓글 작성자와 로그인된 사용자가 같을 때만 수정, 삭제 버튼 표시 */}
-                {loggedInUsername === comment.username && (
-                  <>
-                    <button onClick={() => handleEditClick(comment.freeCommentId, comment.content)}>수정</button>
-                    <button onClick={() => handleDelete(comment.freeCommentId)}>삭제</button>
-                  </>
-                )}
-                <button onClick={() => setReplyCommentId(comment.freeCommentId)}>대댓글 작성</button>
-              </>
-            )}
-
-            {replyCommentId === comment.freeCommentId && (
-              <form onSubmit={(e) => handleReplySubmit(e, comment.freeCommentId)}>
-                <textarea
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  placeholder="대댓글을 입력하세요"
-                  required
-                />
-                <button type="submit">대댓글 작성</button>
-              </form>
-            )}
-
-            {comment.fcchildlist && comment.fcchildlist.length > 0 && (
-              <div className="child-comments" style={{ marginLeft: '20px' }}>
-                {renderComments(comment.fcchildlist)}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <Comment
+        key={comment.freeCommentId}
+        comment={comment}
+        handleEditClick={handleEditClick}
+        handleDelete={handleDelete}
+        setReplyCommentId={setReplyCommentId}
+        loggedInUsername={loggedInUsername}
+        handleEditSubmit={handleEditSubmit}
+        editingCommentId={editingCommentId}
+        setEditingCommentId={setEditingCommentId}
+        editContent={editContent}
+        setEditContent={setEditContent}
+        replyCommentId={replyCommentId}
+        handleReplySubmit={handleReplySubmit}
+        replyContent={replyContent}
+        setReplyContent={setReplyContent}
+      />
     ));
   };
 
@@ -307,29 +269,28 @@ const PostDetail = () => {
       {error && <p className="error-message">{error}</p>}
       {post ? (
         <div>
-          <table className="post-detail-table">
-            <thead>
-              <tr>
-                <th>번호</th>
-                <th>카테고리</th>
-                <th>제목</th>
-                <th>작성자</th>
-                <th>작성일</th>
-                <th>조회수</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{post.freeBoardId || '정보 없음'}</td>
-                <td>{post.type || '정보 없음'}</td>
-                <td>{post.title || '정보 없음'}</td>
-                <td>{post.username || '알 수 없음'}</td>
-                <td>{new Date(post.createDate).toLocaleDateString()}</td>
-                <td>{post.view || '정보 없음'}</td>
-              </tr>
-            </tbody>
-          </table>
-          <h1 className="post-title">{post.title || '정보 없음'}</h1>
+          <div className="post-actions">
+            <button className="action-button" onClick={() => navigate('/board')}>돌아가기</button>
+            {loggedInUsername === post.username && (
+              <>
+                <button className="action-button" onClick={handleEditPostClick}>수정하기</button>
+                <button className="action-button" onClick={handlePostDelete}>삭제하기</button>
+              </>
+            )}
+          </div>
+
+          <div className="post-title-content-container">
+            <h1 className="post-title">{post.title || '정보 없음'}</h1>
+          </div>
+
+          <div className="post-info">
+            <span>번호: {post.freeBoardId || '정보 없음'}</span>
+            <span>카테고리: {post.type || '정보 없음'}</span>
+            <span>작성자: {post.username || '알 수 없음'}</span>
+            <span>작성일: {new Date(post.createDate).toLocaleDateString()}</span>
+            <span>조회수: {post.view || '정보 없음'}</span>
+          </div>
+
           <p className="post-content">{post.content || '정보 없음'}</p>
 
           {post.fimges && post.fimges.length > 0 ? (
@@ -342,27 +303,18 @@ const PostDetail = () => {
             <p>첨부 파일이 없습니다.</p>
           )}
 
-          <div className="post-actions">
-            <button className="back-button" onClick={() => navigate('/board')}>돌아가기</button>
-            
-            {loggedInUsername === post.username && (
-              <>
-                <button className="edit-button" onClick={handleEditPostClick}>수정하기</button>
-                <button className="delete-button" onClick={handlePostDelete}>삭제하기</button>
-              </>
-            )}
-          </div>
-
           <div className="comments-section">
             <h2>댓글</h2>
             <form onSubmit={handleCommentSubmit}>
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="댓글을 입력하세요"
+                placeholder="로그인 시 이용가능합니다.."
                 required
               />
-              <button type="submit">댓글 작성</button>
+              <div className="post-button-container">
+                <button type="submit">댓글 작성</button>
+              </div>
             </form>
             {post.fcomts && post.fcomts.length > 0 ? (
               renderComments(post.fcomts)
@@ -377,5 +329,87 @@ const PostDetail = () => {
     </div>
   );
 };
+
+const Comment = ({ comment, handleEditClick, handleDelete, setReplyCommentId, loggedInUsername, handleEditSubmit, editingCommentId, setEditingCommentId, editContent, setEditContent, replyCommentId, handleReplySubmit, replyContent, setReplyContent }) => (
+  <div className="comment" style={{ marginLeft: comment.parentId ? '20px' : '0px' }}>
+    {comment.deleted ? (
+      <p className="deleted-comment">삭제된 댓글입니다.</p>
+    ) : (
+      <>
+        {/* 유저네임과 작성일자를 위로 이동 */}
+        <div className="comment-header">
+          <span className="comment-username">{comment.username || '알 수 없음'}</span>
+          <span className="comment-date">{new Date(comment.createDate).toLocaleDateString()}</span>
+        </div>
+
+        {editingCommentId === comment.freeCommentId ? (
+          <form onSubmit={(e) => handleEditSubmit(e, comment.freeCommentId)}>
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              required
+            />
+            <div className="comment-edit-buttons">
+              <button type="submit">저장</button>
+              <button type="button" onClick={() => setEditingCommentId(null)}>취소</button>
+            </div>
+          </form>
+        ) : (
+          <>
+            {/* 댓글 내용 */}
+            <p className="comment-content">{comment.content}</p>
+
+            {/* 버튼 컨테이너 */}
+            <div className="comment-buttons">
+              {loggedInUsername === comment.username && (
+                <>
+                  <button onClick={() => handleEditClick(comment.freeCommentId, comment.content)}>수정</button>
+                  <button onClick={() => handleDelete(comment.freeCommentId)}>삭제</button>
+                </>
+              )}
+              <button onClick={() => setReplyCommentId(comment.freeCommentId)}>댓글 작성</button>
+            </div>
+          </>
+        )}
+
+        {replyCommentId === comment.freeCommentId && (
+          <form onSubmit={(e) => handleReplySubmit(e, comment.freeCommentId)}>
+            <textarea
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              placeholder="대댓글을 입력하세요"
+              required
+            />
+            <button type="submit">작성</button>
+          </form>
+        )}
+
+        {comment.fcchildlist && comment.fcchildlist.length > 0 && (
+          <div className="child-comments">
+            {comment.fcchildlist.map((childComment) => (
+              <Comment
+                key={childComment.freeCommentId}
+                comment={childComment}
+                handleEditClick={handleEditClick}
+                handleDelete={handleDelete}
+                setReplyCommentId={setReplyCommentId}
+                loggedInUsername={loggedInUsername}
+                handleEditSubmit={handleEditSubmit}
+                editingCommentId={editingCommentId}
+                setEditingCommentId={setEditingCommentId}
+                editContent={editContent}
+                setEditContent={setEditContent}
+                replyCommentId={replyCommentId}
+                handleReplySubmit={handleReplySubmit}
+                replyContent={replyContent}
+                setReplyContent={setReplyContent}
+              />
+            ))}
+          </div>
+        )}
+      </>
+    )}
+  </div>
+);
 
 export default PostDetail;

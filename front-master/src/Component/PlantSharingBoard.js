@@ -115,7 +115,7 @@ const PlantSharingBoard = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="검색어를 입력하세요"
+                placeholder="제목을 입력하세요"
                 className="plant-sharing-board-search-input"
               />
               <CiSearch className="plant-sharing-board-search-icon" onClick={handleSearch} />

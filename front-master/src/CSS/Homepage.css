@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 .homepage-main-content {
@@ -12,7 +12,6 @@
   text-align: center;
   padding: 20px;
   background-color: #f5f5f5;
-  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
 
 .homepage-button-container {
@@ -21,46 +20,83 @@
   justify-content: center;
   gap: 10px;
   margin-top: 20px;
-  font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
 
 .homepage-button {
   all: unset; /* 모든 기본 스타일 제거 */
-  display: flex; /* 플렉스 박스 사용 */
-  align-items: flex-start; /* 텍스트를 버튼의 위쪽 정렬 */
-  justify-content: space-between; /* 텍스트와 아이콘 사이에 공간을 자동으로 배분 */
-  width: 320px; 
-  height: 450px; /* 버튼의 고정 높이 설정 */
-  background-color: transparent; /* 배경색 제거 */
-  color: black; /* 글자색을 검은색으로 설정 */
-  padding: 20px; /* 버튼 내부 여백 추가 */
-  cursor: pointer; 
-  border: 2px solid; /* 기본 테두리 스타일 설정 */
-  border-radius: 5px; 
+  display: flex;
+  flex-direction: column; /* 버튼 내부 요소를 세로로 배치 */
+  align-items: flex-start;
+  justify-content: flex-start; /* 텍스트와 테이블이 위쪽에 배치되도록 설정 */
+  width: 320px;
+  height: 450px;
+  background-color: transparent;
+  color: black;
+  padding: 20px;
+  cursor: pointer;
+  border: 2px solid;
+  border-radius: 5px;
   font-size: 18px;
-  font-weight: normal; /* 굵기 제거 */
-  transition: background-color 0.3s, color 0.3s; 
-  box-sizing: border-box; 
-  text-align: left; /* 텍스트 왼쪽 정렬 */
+  font-weight: normal;
+  transition: background-color 0.3s, color 0.3s;
+  box-sizing: border-box;
+  text-align: left;
 }
 
 .homepage-button.yellow {
-  border-color: #d3d3d3; /* 노란색 버튼의 회색 외곽선 */
+  border-color: #d3d3d3;
 }
 
 .homepage-button.green {
-  border-color: #d3d3d3; /* 녹색 버튼의 회색 외곽선 */
+  border-color: #d3d3d3;
 }
 
 .homepage-button.blue {
-  border-color: #d3d3d3; /* 파란색 버튼의 회색 외곽선 */
+  border-color: #d3d3d3;
 }
 
 .homepage-button:hover {
-  background-color: #f0f0f0; /* 호버 시 배경색 */
-  color: #333; /* 호버 시 글자색 */
+  background-color: #f0f0f0;
+  color: #333;
 }
 
-.homepage-button .icon {
-  margin-left: 10px; /* 아이콘과 텍스트 사이에 공간 추가 */
+
+
+/* 테이블 스타일 */
+.board-content {
+  margin-top: 20px;
+  width: 100%; /* 버튼 내 테이블이 전체 너비를 차지하도록 설정 */
+}
+
+.board-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.board-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd; /* 각 행에 하단 경계선 추가 */
+}
+
+.board-row {
+  cursor: pointer;
+}
+
+.board-row:hover {
+  background-color: #f0f0f0; /* 호버 시 배경색 변경 */
+}
+
+.homepage-button {
+  position: relative;
+  z-index: 1;
+}
+
+.board-row {
+  pointer-events: auto;
+  z-index: 2; /* 클릭 가능한 요소가 상위에 있도록 설정 */
+}
+
+.board-row td {
+  padding: 8px 12px; /* 셀 안쪽 여백 추가 */
+  font-size: 14px; /* 개별 셀의 글자 크기 조정 */
 }
