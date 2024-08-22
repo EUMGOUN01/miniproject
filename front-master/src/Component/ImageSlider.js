@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import '../CSS/ImageSlider.css'; // CSS 파일 import
 
 const images = [
-  `${process.env.PUBLIC_URL}/pots.png`,
-  `${process.env.PUBLIC_URL}/pots.png`,
-  `${process.env.PUBLIC_URL}/pots.png`,
-  `${process.env.PUBLIC_URL}/pots.png`,
-  `${process.env.PUBLIC_URL}/pots.png`,
+  `${process.env.PUBLIC_URL}/fres02.png`,
+  `${process.env.PUBLIC_URL}/fres01.png`,
+  `${process.env.PUBLIC_URL}/fres03.png`,
+  `${process.env.PUBLIC_URL}/fres04.png`,
 ];
 
 const ImageSlider = () => {

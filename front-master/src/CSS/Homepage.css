@@ -106,3 +106,15 @@
   font-size: 0.9rem;
   color: #333;
 }
+
+.plant-info-image {
+  width: 300%; /* 이미지를 버튼 너비에 맞춤 */
+  height: 300px; /* 원하는 높이로 조정 */
+  
+}
+
+.homepage-button p {
+  margin-bottom: 30px;
+  margin-top: 10px; /* 텍스트와 이미지 간격 조정 */
+  font-size: 18px;
+}

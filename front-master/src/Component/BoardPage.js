@@ -66,13 +66,27 @@ const BoardPage = () => {
     return boardData
       .filter(post => post.title.toLowerCase().includes(appliedSearchQuery.toLowerCase()))
       .filter(post => (selectedCategory ? post.type === selectedCategory : true))
-      .filter(post => privateType === 'public' || post.privateType === privateType || (privateType === 'public' && post.privateType === 'private' && post.username === localStorage.getItem('username')));
-  }, [boardData, appliedSearchQuery, selectedCategory, privateType]);
+      .filter(post => {
+        if (privateType === 'public') {
+          // 전체보기일 때 나만 보기 글은 제외
+          return post.privateType === 'public';
+        }
+  
+        // 로그인 상태에 따른 필터링 로직
+        if (!isLoggedIn && post.privateType === 'private') {
+          return false; // 로그아웃 상태일 때 private 게시물 필터링
+        }
+  
+        return post.privateType === privateType || (privateType === 'public' && post.privateType === 'private' && post.username === localStorage.getItem('username'));
+      });
+  }, [boardData, appliedSearchQuery, selectedCategory, privateType, isLoggedIn]);
 
   const indexOfLastPost = (currentPage + 1) * pageSize;
   const indexOfFirstPost = indexOfLastPost - pageSize;
 
-  const currentPosts = useMemo(() => filteredPosts.slice(indexOfFirstPost, indexOfLastPost), [filteredPosts, indexOfFirstPost, indexOfLastPost]);
+  const currentPosts = useMemo(() => {
+    return filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+  }, [filteredPosts, indexOfFirstPost, indexOfLastPost]);
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 0 && pageNumber < totalPages) {
@@ -151,7 +165,7 @@ const BoardPage = () => {
             {currentPosts.length > 0 ? (
               currentPosts.map((post, index) => (
                 <tr key={post.freeBoardId} onClick={() => navigate(`/post/${post.freeBoardId}`)} className="board-row">
-                  <td>{indexOfFirstPost + index + 1}</td>
+                  <td>{post.freeBoardId}</td>
                   <td>{post.type}</td>
                   <td>{post.title}</td>
                   <td>{post.username || '알 수 없음'}</td>

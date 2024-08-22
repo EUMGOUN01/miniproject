@@ -57,7 +57,7 @@ const Header = () => {
         )}
       </div>
       <hr className="divider" />
-      <h1 onClick={() => navigate('/')}>Greenery</h1>  {/* 로고 클릭 시 메인 페이지로 이동 */}
+      <h1 onClick={() => navigate('/')}>PLANTIUM</h1>  {/* 로고 클릭 시 메인 페이지로 이동 */}
       <hr className="divider" />
       <nav>
         <div className="nav-item" onClick={() => navigate('/info')}>식물백과</div>  {/* 식물백과 페이지 */}

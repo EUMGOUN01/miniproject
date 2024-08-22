@@ -33,6 +33,7 @@ const PlantSharingBoard = () => {
       const response = await fetch(`http://10.125.121.180:8080/api/public/shareboard?page=${page}&size=${size}`);
       const data = await response.json();
 
+      // 최신순으로 정렬
       const sortedData = Array.isArray(data) ? data.sort((a, b) => new Date(b.createDate) - new Date(a.createDate)) : [];
       setBoardData(sortedData);
 
@@ -142,9 +143,9 @@ const PlantSharingBoard = () => {
           </thead>
           <tbody>
             {currentPosts.length > 0 ? (
-              currentPosts.map((post, index) => (
+              currentPosts.map((post) => (
                 <tr key={post.shareBoardId} onClick={() => navigate(`/plant-sharing/${post.shareBoardId}`)} className="board-row">
-                  <td>{indexOfFirstPost + index + 1}</td>
+                  <td>{post.shareBoardId}</td>
                   <td>{post.type}</td>
                   <td>{post.title}</td>
                   <td>{post.username || '알 수 없음'}</td>
@@ -154,7 +155,7 @@ const PlantSharingBoard = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="5">게시물이 없습니다</td>
+                <td colSpan="6">게시물이 없습니다</td>
               </tr>
             )}
           </tbody>

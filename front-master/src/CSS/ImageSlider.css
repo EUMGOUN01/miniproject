@@ -29,15 +29,16 @@
   
   .image-style {
     width: 100%;
-    height: auto; /* Maintain aspect ratio */
-    object-fit: cover;
+    height: auto; /* 이미지를 비율에 맞춰 높이를 자동으로 설정 */
+    max-height: 400px; /* 원하는 최대 높이를 설정 */
+    object-fit: cover; /* 이미지의 비율을 유지하며 잘라내기 */
   }
   
   .text-overlay {
     position: absolute;
     bottom: 10px;
     left: 10px; 
-    color: #fff;
+    color: #eeecec;
     background-color: transparent; 
     padding: 10px;
     border-radius: 5px;

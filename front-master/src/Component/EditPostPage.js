@@ -34,7 +34,7 @@ const EditPostPage = () => {
         if (data.fimges && data.fimges.length > 0) {
           console.log('파일데이터', data);
           const fileData = data.fimges.map(data => ({
-            //fimageid: data.fimagid,
+            fimgid: data.fimagid,
             //name: data.fimgoriname,
             url: `http://10.125.121.180:8080/photos/${data}`,
             existing: true,
@@ -84,6 +84,8 @@ const EditPostPage = () => {
 
   // 기존 파일 삭제 처리
   const handleRemoveFile = (file) => {
+    console.log('파일', files);
+    console.log('테스트', file);
     if (file.existing) {
       setRemovedFiles(files => [...files, file.fimgid]); // 삭제된 기존 파일 ID 저장
     }
@@ -246,7 +248,7 @@ const EditPostPage = () => {
             ))}
           </div>
         )}
-        <button className="action-button" onClick={() => navigate('/board')}>돌아가기</button>
+        
         <div className='btn'><button type="submit" className="action-button">
           수정하기
         </button></div>
