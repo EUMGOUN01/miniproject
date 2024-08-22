@@ -84,7 +84,7 @@ const CommunityGardenPage = () => {
       </div>
 
       {/* 클릭된 주소 나오는 부분 - 맵 아래로 이동 */}
-      <div className="Community-address-section">
+      <div className="Community-address-sections">
         {selectedGarden ? (
           <p><strong>주소:</strong> {selectedGarden.details}</p>
         ) : (

@@ -121,10 +121,10 @@
   position: relative;
 }
 
-.Community-address-section {
+.Community-address-sections {
   position: absolute;
-  bottom: 120px; /* 맵 하단에서 20px 아래에 위치 */
-  left: 80%;
+  bottom: 50px; /* 맵 하단에서 20px 아래에 위치 */
+  left: 70%;
   transform: translateX(-50%);
   font-size: 1.2rem;
   
