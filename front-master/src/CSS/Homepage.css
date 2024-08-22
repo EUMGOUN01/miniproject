@@ -108,8 +108,10 @@
 }
 
 .plant-info-image {
-  width: 300%; /* 이미지를 버튼 너비에 맞춤 */
-  height: 300px; /* 원하는 높이로 조정 */
+  width: 200px; /* 이미지를 버튼 너비에 맞춤 */
+  height: 250px; /* 원하는 높이로 조정 */
+  margin-left: 35px;
+  
   
 }
 
