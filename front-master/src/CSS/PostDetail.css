@@ -12,12 +12,18 @@
   box-sizing: border-box;
 }
 
-/* 버튼 컨테이너 */
 .post-actions {
+  position: relative;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-top: 25px;
+  margin-bottom: 65px;
+}
+
+.post-actions .left {
+  position: absolute;
+  left: 0;
 }
 
 /* 버튼 스타일 */
@@ -60,6 +66,12 @@
   color: #333;
   text-align: left;
   flex: 1;
+  margin-bottom: 20px
+}
+
+.post-images{
+  margin-bottom: 20px;
+  margin-top : 20px;
 }
 
 /* 게시물 정보 스타일 */
@@ -140,7 +152,7 @@ textarea {
 
 /* 댓글 작성 버튼과 댓글 리스트 사이의 간격 */
 .comments-section {
-  margin-top: 40px;
+  margin-top: 50px;
 }
 
 .comment {
@@ -243,3 +255,5 @@ textarea {
   gap: 10px;
   margin-top: 10px;
 }
+
+

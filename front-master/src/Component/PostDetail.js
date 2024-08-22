@@ -269,15 +269,7 @@ const PostDetail = () => {
       {error && <p className="error-message">{error}</p>}
       {post ? (
         <div>
-          <div className="post-actions">
-            <button className="action-button" onClick={() => navigate('/board')}>돌아가기</button>
-            {loggedInUsername === post.username && (
-              <>
-                <button className="action-button" onClick={handleEditPostClick}>수정하기</button>
-                <button className="action-button" onClick={handlePostDelete}>삭제하기</button>
-              </>
-            )}
-          </div>
+
 
           <div className="post-title-content-container">
             <h1 className="post-title">{post.title || '정보 없음'}</h1>
@@ -296,12 +288,24 @@ const PostDetail = () => {
           {post.fimges && post.fimges.length > 0 ? (
             <div className="post-images">
               {post.fimges.map((image, index) => (
-                <ImageComponent key={index} filename={`null${image}`} />
+                <ImageComponent key={index} filename={image} />
               ))}
             </div>
           ) : (
-            <p>첨부 파일이 없습니다.</p>
+            <p></p>
           )}
+
+          <div className="post-actions">
+          <div className='left'>
+            <button className="action-button" onClick={() => navigate('/board')}>돌아가기</button>
+          </div>
+            {loggedInUsername === post.username && (
+              <>
+                <button className="action-button" onClick={handleEditPostClick}>수정하기</button>
+                <button className="action-button" onClick={handlePostDelete}>삭제하기</button>
+              </>
+            )}
+          </div>
 
           <div className="comments-section">
             <h2>댓글</h2>
@@ -309,11 +313,14 @@ const PostDetail = () => {
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="로그인 시 이용가능합니다.."
+                placeholder={loggedInUsername ? '댓글을 입력해주세요.' : '로그인 시 이용가능합니다.'}
                 required
+                disabled={!loggedInUsername} // Disable textarea if not logged in
               />
               <div className="post-button-container">
-                <button type="submit">댓글 작성</button>
+                <button type="submit" disabled={!loggedInUsername}>
+                  댓글 작성
+                </button>
               </div>
             </form>
             {post.fcomts && post.fcomts.length > 0 ? (

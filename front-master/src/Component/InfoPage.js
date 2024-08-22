@@ -52,7 +52,6 @@ const InfoPage = () => {
               alt="Image Thumbnail" 
             />
             <p><strong>{garden.cntntsSj}</strong></p>
-            <p><strong>{garden.cntntsNo}</strong></p>
             <button onClick={() => handlePlantClick(garden.cntntsNo)}>상세 보기</button>
           </div>
         ))}

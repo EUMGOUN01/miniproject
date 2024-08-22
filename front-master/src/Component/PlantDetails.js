@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ImageComponent from '../Component/ImageComponent';
 import '../CSS/PlantDetail.css';
+import '../CSS/PostDetail.css';
 
 const PlantDetail = () => {
   const { shareBoardId } = useParams();
@@ -291,6 +292,7 @@ const PlantDetail = () => {
     }
   };
 
+
   const renderComments = (comments) => {
     return comments.map((comment) => (
       <div key={comment.shareCommentId} className="comment" style={{ marginLeft: comment.parentId ? '20px' : '0px' }}>
@@ -298,11 +300,6 @@ const PlantDetail = () => {
           <p className="deleted-comment">삭제된 댓글입니다.</p>
         ) : (
           <>
-            <div className="comment-header">
-              <span className="comment-username">{comment.username || '알 수 없음'}</span>
-              <span className="comment-date">{new Date(comment.createDate).toLocaleDateString()}</span>
-            </div>
-  
             {editingCommentId === comment.shareCommentId ? (
               <form onSubmit={(e) => handleEditSubmit(e, comment.shareCommentId)} className="edit-comment-section">
                 <textarea
@@ -318,15 +315,16 @@ const PlantDetail = () => {
             ) : (
               <>
                 <p className="comment-content">{comment.content}</p>
-                <div className="comment-buttons">
-                  {loggedInUsername === comment.username && (
-                    <>
-                      <button onClick={() => handleEditClick(comment.shareCommentId, comment.content)}>수정</button>
-                      <button onClick={() => handleDelete(comment.shareCommentId)}>삭제</button>
-                    </>
-                  )}
-                  <button onClick={() => setReplyCommentId(comment.shareCommentId)}>대댓글 작성</button>
-                </div>
+                <span className="comment-username">{comment.username || '알 수 없음'}</span>
+                <span className="comment-date">{new Date(comment.createDate).toLocaleDateString()}</span>
+  
+                {loggedInUsername === comment.username && (
+                  <div className="comment-actions">
+                    <button onClick={() => handleEditClick(comment.shareCommentId, comment.content)}>수정</button>
+                    <button onClick={() => handleDelete(comment.shareCommentId)}>삭제</button>
+                  </div>
+                )}
+                <button onClick={() => setReplyCommentId(comment.shareCommentId)} className="reply-button">대댓글 작성</button>
               </>
             )}
   
@@ -358,39 +356,29 @@ const PlantDetail = () => {
       {error && <p className="error-message">{error}</p>}
       {post ? (
         <div>
-          <table className="post-detail-table">
-            <thead>
-              <tr>
-                <th>번호</th>
-                <th>카테고리</th>
-                <th>제목</th>
-                <th>작성자</th>
-                <th>작성일</th>
-                <th>조회수</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{post.shareBoardId || '정보 없음'}</td>
-                <td>{post.type || '정보 없음'}</td>
-                <td>{post.title || '정보 없음'}</td>
-                <td>{post.username || '알 수 없음'}</td>
-                <td>{new Date(post.createDate).toLocaleDateString()}</td>
-                <td>{post.view || '정보 없음'}</td>
-              </tr>
-            </tbody>
-          </table>
-          <h1 className="post-title">{post.title || '정보 없음'}</h1>
+
+          <div className="post-title-content-container">
+            <h1 className="post-title">{post.title || '정보 없음'}</h1>
+          </div>
+
+          <div className="post-info">
+            <span>번호: {post.shareBoardId || '정보 없음'}</span>
+            <span>카테고리: {post.type || '정보 없음'}</span>
+            <span>작성자: {post.username || '알 수 없음'}</span>
+            <span>작성일: {new Date(post.createDate).toLocaleDateString()}</span>
+            <span>조회수: {post.view || '정보 없음'}</span>
+          </div>
+
           <p className="post-content">{post.content || '정보 없음'}</p>
-  
+
           {post.simges && post.simges.length > 0 ? (
             <div className="post-images">
               {post.simges.map((image, index) => (
-                <ImageComponent key={index} filename={`null${image}`} />
+                <ImageComponent key={index} filename={image} />
               ))}
             </div>
           ) : (
-            <p>첨부 파일이 없습니다.</p>
+            <p></p>
           )}
   
           {post.address && post.address.trim() && (
@@ -401,28 +389,36 @@ const PlantDetail = () => {
               </div>
             </>
           )}
-  
-          <div className="post-actions">
-            <button className="action-button" onClick={() => navigate('/plant-sharing')}>돌아가기</button>
-            
-            {loggedInUsername === post.username && (
-              <>
-                <button className="action-button" onClick={handleEditPostClick}>수정하기</button>
-                <button className="action-button" onClick={handlePostDelete}>삭제하기</button>
-              </>
-            )}
+
+
+        <div className="post-actions">
+            <div className='left'>
+                <button className="action-button" onClick={() => navigate('/plant-sharing')}>돌아가기</button>
+          </div>
+        
+         {loggedInUsername === post.username && (
+             <>
+              <button className="action-button" onClick={handleEditPostClick}>수정하기</button>
+                        <button className="action-button" onClick={handlePostDelete}>삭제하기</button>
+                      </>
+                    )}
           </div>
   
           <div className="comments-section">
             <h2>댓글</h2>
-            <form onSubmit={handleCommentSubmit} className="comment-form">
+            <form onSubmit={handleCommentSubmit}>
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="로그인 시 이용가능합니다.."
+                placeholder={loggedInUsername ? '댓글을 입력해주세요.' : '로그인 시 이용가능합니다.'}
                 required
+                disabled={!loggedInUsername} 
               />
-              <button type="submit">댓글 작성</button>
+              <div className="post-button-container">
+                <button type="submit" disabled={!loggedInUsername}>
+                  댓글 작성
+                </button>
+              </div>
             </form>
             {post.scomts && post.scomts.length > 0 ? (
               renderComments(post.scomts)

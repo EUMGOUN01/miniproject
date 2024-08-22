@@ -8,15 +8,39 @@ const SignupPage = () => {
   const [password, setPassword] = useState('');
   const [alias, setAlias] = useState('');
   const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setError(''); // 오류 메시지 초기화
+    const newErrors = {};
+
+    // 유효성 검사
+    if (username.length > 16) {
+      newErrors.username = '아이디는 16자 이하로 입력해주세요.';
+    }
+    if (password.length < 8) {
+      newErrors.password = '비밀번호는 8자 이상이어야 합니다.';
+    }
+    if (!validateEmail(email)) {
+      newErrors.email = '올바른 이메일 형식을 입력해주세요.';
+    }
+
+    setErrors(newErrors);
+
+    // 오류가 있으면 더 진행하지 않음
+    if (Object.keys(newErrors).length > 0) {
+      console.log("오류 발생:", newErrors);  // 디버그용 출력
+      return;
+    }
 
     try {
-      const response = await fetch('http://10.125.121.180:8080/signin', { 
+      const response = await fetch('http://10.125.121.180:8080/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,11 +61,11 @@ const SignupPage = () => {
       } else {
         const errorData = await response.json();
         const errorMessage = errorData.message || '중복된 아이디 입니다.'; // 기본 오류 메시지 설정
-        setError(errorMessage); // 오류 메시지 설정
+        setErrors({ form: errorMessage }); // 폼 전체에 오류 메시지 설정
       }
     } catch (error) {
       console.error('회원가입 중 오류 발생:', error);
-      setError('회원가입 중 문제가 발생했습니다. 나중에 다시 시도해주세요.');
+      setErrors({ form: '회원가입 중 문제가 발생했습니다. 나중에 다시 시도해주세요.' });
     }
   };
 
@@ -60,6 +84,8 @@ const SignupPage = () => {
               className="Signinput"
               required
             />
+            {/* 강제로 오류 메시지 추가해서 확인 */}
+            {errors.username && <p className="Signerror">{errors.username}</p>}
           </div>
           <div className="Signinput-group">
             <label htmlFor="password" className="Signlabel">비밀번호:</label>
@@ -71,6 +97,7 @@ const SignupPage = () => {
               className="Signinput"
               required
             />
+            {errors.password && <p className="Signerror">{errors.password}</p>}
           </div>
           <div className="Signinput-group">
             <label htmlFor="alias" className="Signlabel">닉네임:</label>
@@ -93,6 +120,7 @@ const SignupPage = () => {
               className="Signinput"
               required
             />
+            {errors.email && <p className="Signerror">{errors.email}</p>}
           </div>
           <button type="submit" className="Signbutton">회원가입</button>
         </form>
@@ -101,8 +129,8 @@ const SignupPage = () => {
         </div>
       </div>
 
-      {/* 모달 창을 에러가 있을 때만 표시 */}
-      {error && <Modal message={error} onClose={() => setError('')} />}
+      {/* 폼 전반적인 에러 메시지 표시 */}
+      {errors.form && <Modal message={errors.form} onClose={() => setErrors({ form: '' })} />}
     </div>
   );
 };

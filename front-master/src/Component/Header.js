@@ -43,15 +43,18 @@ const Header = () => {
 
   return (
     <header className="header">
-  <div className="top-nav">
-    {!isLoggedIn ? (
-      <span className="top-nav-item" onClick={() => navigate('/login')}>로그인</span>
-    ) : (
-      <div className="user-info">
-        <span className="username">환영합니다, {username}님</span>
-        <span className="top-nav-item logout" onClick={handleLogout}>로그아웃</span>
-      </div>
-    )}
+      <div className="top-nav">
+        {!isLoggedIn && (
+          <span className="top-nav-item" onClick={() => navigate("/signup")}>회원가입</span>
+        )}
+        {!isLoggedIn ? (
+          <span className="top-nav-item" onClick={() => navigate('/login')}>로그인</span>
+        ) : (
+          <div className="user-info">
+            <span className="username">환영합니다, {username}님</span>
+            <span className="top-nav-item logout" onClick={handleLogout}>로그아웃</span>
+          </div>
+        )}
       </div>
       <hr className="divider" />
       <h1 onClick={() => navigate('/')}>Greenery</h1>  {/* 로고 클릭 시 메인 페이지로 이동 */}

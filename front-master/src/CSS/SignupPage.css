@@ -101,3 +101,9 @@
   text-align: center;
   font-family: 'Noto Sans KR', sans-serif;  /* 폰트 패밀리 적용 */
 }
+
+.Signerror {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 5px;
+}

@@ -266,7 +266,7 @@ const PlantSharingBoardWrite = ({ initialShareBoard }) => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="form-input"
-            placeholder="제목을 입력하세요"
+            placeholder="제목을 입력하세요(20자 이하)"
             required
           />
         </label>
@@ -276,7 +276,7 @@ const PlantSharingBoardWrite = ({ initialShareBoard }) => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="form-textarea"
-            placeholder="내용을 입력하세요"
+            placeholder="내용을 입력하세요(5000자 이하)"
             required
           />
         </label>

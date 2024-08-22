@@ -5,7 +5,7 @@ import '../CSS/WritePostPage.css'; // CSS 파일 불러오기
 const WritePostPage = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('기타');
+  const [category, setCategory] = useState('');
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
   const [privateType, setPrivateType] = useState('public'); // privateType 상태 추가
@@ -107,7 +107,7 @@ const WritePostPage = () => {
               className="write-select"
             >
               <option value="질문">질문</option>
-              <option value="기타">수다</option>
+              <option value="수다">수다</option>
             </select>
           </label>
         </div>
@@ -134,7 +134,7 @@ const WritePostPage = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="write-input"
-            placeholder="제목을 입력하세요"
+            placeholder="제목을 입력하세요(20자 이하)"
             required
           />
         </label>
@@ -145,7 +145,7 @@ const WritePostPage = () => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="write-textarea"
-            placeholder="내용을 입력하세요"
+            placeholder="내용을 입력하세요(5000자 이하)"
             required
           />
         </label>

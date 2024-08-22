@@ -16,7 +16,7 @@ const Homepage = () => {
 
   const loadFreeBoard = async () => {
     try {
-        const response = await fetch('http://10.125.121.180:8080/api/public/freeboard/latest5');
+        const response = await fetch('http://10.125.121.180:8080/api/public/freeboard/latest');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -29,7 +29,7 @@ const Homepage = () => {
 
   const loadShareBoard = async () => {
     try {
-        const response = await fetch('http://10.125.121.180:8080/api/public/shareboard/latest5');
+        const response = await fetch('http://10.125.121.180:8080/api/public/shareboard/latest');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -56,8 +56,8 @@ const Homepage = () => {
             className="homepage-button yellow"
             onClick={() => handleNavigation('/info')}
           >
-            식물백과
-            {/* <FaChevronRight className="icon" /> */}
+            식물백과 
+            <p className="button-ment">217가지의 놀라운 실내정원 식물들 알아보기</p> 
           </div>
 
           {/* 식물나눔 버튼 */}
@@ -79,6 +79,7 @@ const Homepage = () => {
                           }} 
                           className="board-row"
                       >
+                        <td>{share.type}</td>
                         <td>{share.title}</td>
                         <td>{new Date(share.createDate).toLocaleDateString()}</td>
                       </tr>
@@ -107,6 +108,7 @@ const Homepage = () => {
                           }} 
                           className="board-row"
                       >
+                        <td>{free.type}</td>
                         <td>{free.title}</td>
                         <td>{new Date(free.createDate).toLocaleDateString()}</td>
                       </tr>

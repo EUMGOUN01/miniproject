@@ -131,3 +131,10 @@
   max-height: 100px;
   object-fit: cover;
 }
+
+
+.btn {
+  position: absolute;
+  right: 560px;
+  margin-top: 650px;
+}

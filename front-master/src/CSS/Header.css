@@ -27,7 +27,7 @@
 }
 
 .header .top-nav-item {
-  font-size: 12px; /* 로그아웃 버튼의 글자 크기를 16px로 설정 */
+  font-size: 14px; /* 로그아웃 버튼의 글자 크기를 16px로 설정 */
   color: #2e3632;
   cursor: pointer;
   font-family: 'Noto Sans KR', sans-serif; /* 폰트 패밀리 적용 */
@@ -51,7 +51,7 @@
   width: 100%; /* 구분선 길이 조절 */
   max-width: 100%; /* 최대 너비를 전체 너비로 설정 */
   border: none;
-  border-top: 1px solid #dfdfdf;
+  border-top: 1px solid #f3f3f3;
   margin: 0 auto; /* 중앙 정렬 */
 }
 

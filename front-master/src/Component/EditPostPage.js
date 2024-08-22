@@ -3,16 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import '../CSS/WritePostPage.css'; // CSS 파일
 
 const EditPostPage = () => {
-  const { freeBoardId } = useParams(); // URL 파라미터에서 freeBoardId 추출
-  const navigate = useNavigate(); // 페이지 이동을 위한 navigate 훅
+  const { freeBoardId } = useParams();
+  const navigate = useNavigate();
 
-  const [title, setTitle] = useState(''); // 게시글 제목 상태
-  const [category, setCategory] = useState('질문'); // 게시글 카테고리 상태
-  const [content, setContent] = useState(''); // 게시글 내용 상태
-  const [files, setFiles] = useState([]); // 첨부 파일 상태
-  const [removedFiles, setRemovedFiles] = useState([]); // 삭제된 파일 상태
-  const [privateType, setPrivateType] = useState('public'); // 전체보기/나만보기 상태
-  const [error, setError] = useState(''); // 오류 메시지 상태
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('질문');
+  const [content, setContent] = useState('');
+  const [files, setFiles] = useState([]);
+  const [removedFiles, setRemovedFiles] = useState([]);
+  const [privateType, setPrivateType] = useState('public');
+  const [error, setError] = useState('');
 
   // 게시글 데이터를 불러오는 함수
   useEffect(() => {
@@ -20,16 +20,28 @@ const EditPostPage = () => {
       try {
         const response = await fetch(`http://10.125.121.180:8080/api/public/freeboard/${freeBoardId}`);
         const data = await response.json();
-        setTitle(data.title);
-        setCategory(data.type);
-        setContent(data.content);
+        console.log('파일데이터22', data);
+
+        // 데이터 유효성 확인 및 설정
+        setTitle(data.title || '');
+        setCategory(data.type || '질문');
+        setContent(data.content || '');
         setPrivateType(data.privateType || 'public');
-        setFiles(data.fimges ? data.fimges.map(file => ({
-          fimgid: file.fimgid,
-          name: file.fimgoriname,
-          url: `http://10.125.121.180:8080/photos/${file.fimgid}`,
-          existing: true,
-        })) : []);
+
+       
+
+        // 이미지 데이터를 처리
+        if (data.fimges && data.fimges.length > 0) {
+          console.log('파일데이터', data);
+          const fileData = data.fimges.map(data => ({
+            //fimageid: data.fimagid,
+            //name: data.fimgoriname,
+            url: `http://10.125.121.180:8080/photos/${data}`,
+            existing: true,
+          }));
+          setFiles(fileData); // 서버에서 가져온 기존 파일들을 상태에 설정
+          console.log('데이터확인', fileData);
+        }
       } catch (error) {
         console.error('Error fetching post:', error);
         setError('게시글을 불러오는 중 오류가 발생했습니다.');
@@ -41,6 +53,9 @@ const EditPostPage = () => {
   // 파일 선택 시 호출되는 함수
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
+
+    console.log('파일 확인', selectedFiles);
+
     const validFiles = selectedFiles.filter(file => {
       if (!file.type.startsWith('image/')) {
         setError('이미지 파일만 업로드할 수 있습니다.');
@@ -53,17 +68,33 @@ const EditPostPage = () => {
       return true;
     });
 
-    setFiles(prevFiles => [...prevFiles, ...validFiles.map(file => ({ file, existing: false }))]);
+    // 기존 파일 목록을 유지하면서 새 파일 추가
+    const newFiles = validFiles.map(file => ({
+      file,
+      name: file.name,
+      existing: false,
+    }));
+    
+    console.log('기존데이터', files);
+
+    setFiles(files => [...files, ...newFiles]); // 기존 파일 + 새 파일로 상태 업데이트
+    console.log('기존+새',files);
     setError('');
   };
 
   // 기존 파일 삭제 처리
   const handleRemoveFile = (file) => {
     if (file.existing) {
-      setRemovedFiles(prev => [...prev, file.fimgid]); // 삭제된 파일 ID 추가
+      setRemovedFiles(files => [...files, file.fimgid]); // 삭제된 기존 파일 ID 저장
     }
-    setFiles(prevFiles => prevFiles.filter(f => f !== file)); // UI에서 제거
+    setFiles(files => files.filter(f => f !== files)); // UI에서 파일 제거
+
+    console.log(file.fimgid);
   };
+
+ 
+
+  
 
   // 폼 제출 시 호출되는 함수
   const handleSubmit = async (e) => {
@@ -74,7 +105,7 @@ const EditPostPage = () => {
       return;
     }
 
-    // 식물 나눔 게시판 데이터
+    //자유 게시판 데이터
     const formData = new FormData();
     formData.append('freeboarddata', new Blob([JSON.stringify({
       freeBoardId,
@@ -84,8 +115,8 @@ const EditPostPage = () => {
       content,
       removedFiles,
     })], { type: 'application/json' }));
-
-    // 새로 추가된 파일만 업로드
+    console.log('폼',formData);
+    // 새로 추가된 파일들만 FormData에 추가
     files.forEach(file => {
       if (!file.existing && file.file) {
         formData.append('files', file.file); // 새로운 파일만 추가
@@ -100,11 +131,10 @@ const EditPostPage = () => {
     }
 
     try {
-      // 서버에 게시글 수정 요청 보내기
       const response = await fetch(`http://10.125.121.180:8080/api/users/freeboard`, {
-        method: 'PUT', // PUT 요청
+        method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+          'Authorization': `Bearer ${token}`,
         },
         body: formData,
       });
@@ -122,7 +152,6 @@ const EditPostPage = () => {
     }
   };
 
-  // 게시판 구조
   return (
     <div className="write-container">
       <form className="write-form" onSubmit={handleSubmit}>
@@ -190,11 +219,21 @@ const EditPostPage = () => {
           <div className="preview-container">
             {files.map((file, index) => (
               <div key={index} className="preview-item">
-                <img
-                  src={file.url || URL.createObjectURL(file.file)}
-                  alt={`Preview ${file.name}`}
-                  className="preview-image"
-                />
+                {file.existing && file.url ? (
+                  <img
+                    src={file.url}
+                    alt={`Preview ${file.name}`}
+                    className="preview-image"
+                  />
+                ) : (
+                  file.file && (
+                    <img
+                      src={URL.createObjectURL(file.file)}
+                      alt={`Preview ${file.name}`}
+                      className="preview-image"
+                    />
+                  )
+                )}
                 <p>{file.name}</p>
                 <button
                   type="button"
@@ -207,9 +246,11 @@ const EditPostPage = () => {
             ))}
           </div>
         )}
-        <button type="submit" className="write-submit-btn">
+        <button className="action-button" onClick={() => navigate('/board')}>돌아가기</button>
+        <div className='btn'><button type="submit" className="action-button">
           수정하기
-        </button>
+        </button></div>
+        
       </form>
     </div>
   );
