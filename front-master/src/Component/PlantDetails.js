@@ -397,10 +397,10 @@ const PlantDetail = () => {
           </div>
         
          {loggedInUsername === post.username && (
-             <>
+             <div>
               <button className="action-button" onClick={handleEditPostClick}>수정하기</button>
                         <button className="action-button" onClick={handlePostDelete}>삭제하기</button>
-                      </>
+                      </div>
                     )}
           </div>
   

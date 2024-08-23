@@ -123,7 +123,7 @@
 
 .Community-address-sections {
   position: absolute;
-  bottom: 50px; /* 맵 하단에서 20px 아래에 위치 */
+  bottom: 150px; /* 맵 하단에서 20px 아래에 위치 */
   left: 70%;
   transform: translateX(-50%);
   font-size: 1.2rem;

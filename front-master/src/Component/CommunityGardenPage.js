@@ -20,17 +20,17 @@ const gardenData = [
 ];
 
 const CommunityGardenPage = () => {
-  const [selectedGarden, setSelectedGarden] = useState(null); // State to track selected garden's address
-  const [mapCenter, setMapCenter] = useState({ lat: 35.084138, lng: 128.873972 }); // State to manage map center
+  const [selectedGarden, setSelectedGarden] = useState(null); 
+  const [mapCenter, setMapCenter] = useState({ lat: 35.084138, lng: 128.873972 }); 
 
   const handleButtonClick = (garden) => {
     setSelectedGarden(garden);
-    setMapCenter(garden.location); // Set map center to selected garden's location
+    setMapCenter(garden.location); 
   };
 
   const handleMarkerClick = (garden) => {
-    setSelectedGarden(garden); // Show the address of the selected garden
-    setMapCenter(garden.location); // Move map to the selected garden's location
+    setSelectedGarden(garden); 
+    setMapCenter(garden.location); 
   };
 
   return (
@@ -53,7 +53,7 @@ const CommunityGardenPage = () => {
             자세한 정보 보기
           </a>
         </div>
-        {/* Buttons for selecting gardens */}
+
         <div className="Community-garden-buttons">
           {gardenData.map(garden => (
             <button
@@ -77,7 +77,7 @@ const CommunityGardenPage = () => {
             <MapMarker
               key={garden.id}
               position={garden.location}
-              onClick={() => handleMarkerClick(garden)} // Marker click event
+              onClick={() => handleMarkerClick(garden)} 
             />
           ))}
         </Map>

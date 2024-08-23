@@ -249,7 +249,7 @@ const EditPostPage = () => {
           </div>
         )}
         
-        <div className='btn'><button type="submit" className="action-button">
+        <div className=''><button type="submit" className="action-button">
           수정하기
         </button></div>
         
